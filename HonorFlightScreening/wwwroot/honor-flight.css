@@ -292,6 +292,20 @@ body {
     margin-top: 0.25rem;
 }
 
+.field-validation-error {
+    color: var(--hf-danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.input-validation-error {
+    border-color: var(--hf-danger);
+}
+
+.validation-summary {
+    border-color: var(--hf-danger);
+}
+
 /* Character Counter */
 .form-text {
     display: flex;
