@@ -2,10 +2,6 @@
 
 A mobile-first web application for conducting medical and mobility screenings of veterans participating in Honor Flight programs. This digital form replaces paper-based interviews and provides a streamlined, professional interface for collecting essential health and safety information.
 
-## About Honor Flight
-
-Honor Flight is a non-profit organization dedicated to transporting America's veterans to Washington, D.C. to visit the memorials dedicated to their service. This screening form ensures veteran safety and comfort during these meaningful journeys.
-
 ## Features
 
 ### Core Functionality
@@ -34,7 +30,7 @@ Honor Flight is a non-profit organization dedicated to transporting America's ve
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- No server or database required - runs entirely in the browser
+
 
 ### Installation
 1. Clone the repository:
@@ -51,29 +47,6 @@ open index.html
 python -m http.server 8000  # For local development server
 ```
 
-### Deployment
-The application is a single HTML file that can be deployed anywhere:
-- Static hosting (Netlify, Vercel, GitHub Pages)
-- Web servers (Apache, Nginx)
-- Intranet systems
-- Tablet kiosks
-
-## Usage
-
-### For Interviewers
-1. Enter the veteran's name at the top of the form
-2. Work through each section systematically:
-   - Medical History Form Review
-   - Medical Assessment
-   - Mobility and Travel
-   - Post Interview Review
-3. Add any additional notes in the Notes section
-4. Review alert flags before completing the interview
-
-### Form Sections
-
-#### Medical History Form Review
-- Verifies if Primary Care Provider signature is present on medical forms
 
 #### Medical Assessment
 - **Oxygen Use** - Includes amount specification
@@ -114,12 +87,6 @@ The application is a single HTML file that can be deployed anywhere:
 
 ## 🔧 Technical Details
 
-### Technologies Used
-- **HTML5** - Semantic markup
-- **CSS3** - Modern styling with flexbox and grid
-- **Vanilla JavaScript** - No dependencies or frameworks
-- **Responsive Design** - Mobile-first approach
-
 ### Browser Support
 - Chrome 60+
 - Firefox 60+
@@ -146,10 +113,6 @@ honor-flight-screening/
 ![Mobile View](assets/images/mobile-view.png)
 *Mobile-optimized view on smartphone*
 
-## Contributing
-
-We welcome contributions from the community! Please follow these guidelines:
-
 ### Development Setup
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/new-feature`
@@ -157,12 +120,6 @@ We welcome contributions from the community! Please follow these guidelines:
 4. Test thoroughly on multiple devices
 5. Submit a pull request
 
-### Code Style
-- Use semantic HTML elements
-- Follow BEM CSS methodology for class naming
-- Write accessible code (WCAG 2.1 AA compliance)
-- Comment complex JavaScript functions
-- Maintain mobile-first responsive design
 
 ### Testing Checklist
 - [ ] Form works on mobile devices (320px+)
@@ -172,22 +129,8 @@ We welcome contributions from the community! Please follow these guidelines:
 - [ ] Form data can be captured/exported
 - [ ] Visual design matches specifications
 
-## 📋 Roadmap
-
-### Planned Features
-- [ ] **Data Export** - JSON/CSV export functionality
-- [ ] **Print Support** - Printer-friendly form layouts
-- [ ] **Offline Mode** - Service worker for offline capability
-- [ ] **Multi-language** - Spanish translation support
-- [ ] **Digital Signatures** - Electronic signature capture
-- [ ] **Integration APIs** - EMR system integration
-- [ ] **Analytics** - Form completion tracking
-- [ ] **Accessibility** - Enhanced screen reader support
-
 ### Version History
 - **v1.0.0** - Initial release with core screening functionality
-- **v1.1.0** - Mobile responsiveness improvements
-- **v1.2.0** - Conditional logic enhancements
 
 ## License
 
