@@ -2,11 +2,11 @@
 
 A mobile-first web application for conducting medical and mobility screenings of veterans participating in Honor Flight programs. This digital form replaces paper-based interviews and provides a streamlined, professional interface for collecting essential health and safety information.
 
-## 🇺🇸 About Honor Flight
+## About Honor Flight
 
 Honor Flight is a non-profit organization dedicated to transporting America's veterans to Washington, D.C. to visit the memorials dedicated to their service. This screening form ensures veteran safety and comfort during these meaningful journeys.
 
-## ✨ Features
+## Features
 
 ### Core Functionality
 - **Mobile-Optimized Design** - Responsive interface designed for tablets and smartphones
@@ -30,7 +30,7 @@ Honor Flight is a non-profit organization dedicated to transporting America's ve
 - Progress indicator
 - Patriotic design elements
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
@@ -58,7 +58,7 @@ The application is a single HTML file that can be deployed anywhere:
 - Intranet systems
 - Tablet kiosks
 
-## 📱 Usage
+## Usage
 
 ### For Interviewers
 1. Enter the veteran's name at the top of the form
@@ -91,7 +91,7 @@ The application is a single HTML file that can be deployed anywhere:
 - **Mobility Issue Alert** - Flags requiring mobility assistance
 - **Special Issue Alert** - Other concerns requiring attention
 
-## 🎨 Design System
+## Design System
 
 ### Color Palette
 - **Primary Blue**: `#4a5568` (Headers, sections)
@@ -146,7 +146,7 @@ honor-flight-screening/
 ![Mobile View](assets/images/mobile-view.png)
 *Mobile-optimized view on smartphone*
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Please follow these guidelines:
 
@@ -189,22 +189,22 @@ We welcome contributions from the community! Please follow these guidelines:
 - **v1.1.0** - Mobile responsiveness improvements
 - **v1.2.0** - Conditional logic enhancements
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏥 Support
+## Support
 
 ### For Technical Issues
 - Create an issue in this repository
 - Email: tech-support@honorflight.org
-- Documentation: [Wiki](https://github.com/your-org/honor-flight-screening/wiki)
+- Documentation: [Wiki](https://github.com/3cstudios/honor-flight-screening/wiki)
 
 ### For Honor Flight Program Questions
 - Visit: [Honor Flight Network](https://www.honorflight.org)
 - Contact your local Honor Flight hub
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Honor Flight Network for their service to veterans
 - The veteran community for their feedback and input
