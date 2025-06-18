@@ -1,0 +1,82 @@
+﻿@page "/"
+
+<PageTitle>Honor Flight Screening</PageTitle>
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="text-center mb-5">
+                <div class="patriotic-border"></div>
+                <h1 class="display-4 text-primary mb-3">
+                    <i class="fas fa-user-shield me-3"></i>
+                    Honor Flight Veteran Screening
+                </h1>
+                <p class="lead text-muted">
+                    Supporting our heroes with comprehensive medical and mobility screening for safe travel
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clipboard-list fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Medical Assessment</h5>
+                            <p class="card-text">
+                                Comprehensive medical history review and assessment including oxygen, insulin, and medication requirements.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-walking fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Mobility Evaluation</h5>
+                            <p class="card-text">
+                                Evaluation of assistive device requirements and mobility limitations to ensure safe and comfortable travel.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <AuthorizeView>
+                <Authorized>
+                    <div class="text-center mt-5">
+                        <a href="/screenings" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>
+                            Start New Screening
+                        </a>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="alert alert-info mt-5" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Get Started:</strong> Please 
+                        <a href="/Account/Login" class="alert-link">login</a> or 
+                        <a href="/Account/Register" class="alert-link">register</a> to access the veteran screening system.
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">
+                                <i class="fas fa-star me-2"></i>
+                                About Honor Flight
+                            </h5>
+                            <p class="card-text">
+                                Honor Flight is a non-profit organization dedicated to transporting America's veterans to Washington, D.C. 
+                                to visit the memorials dedicated to their service. This screening application ensures the safety and 
+                                comfort of our veterans during their journey by collecting essential medical and mobility information.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

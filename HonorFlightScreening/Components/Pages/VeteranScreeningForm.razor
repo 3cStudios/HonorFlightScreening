@@ -1,0 +1,421 @@
+@page "/screening/new"
+@page "/screening/{Id:int}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using HonorFlightScreening.Data
+@using HonorFlightScreening.Services
+@attribute [Authorize]
+@inject VeteranScreeningService ScreeningService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>@(IsNewScreening ? "New" : "Edit") Veteran Screening</PageTitle>
+
+<div class="container-fluid">
+    @if (screening == null && !IsNewScreening)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="mb-0">
+                                    <i class="fas fa-user-shield me-2"></i>
+                                    Honor Flight Veteran Screening
+                                </h4>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-outline-light btn-sm" @onclick="GoBack">
+                                    <i class="fas fa-arrow-left me-1"></i>
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <EditForm Model="screening" OnValidSubmit="SaveScreening">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary class="alert alert-danger" />
+
+                            <!-- Veteran Information -->
+                            <div class="screening-section">
+                                <div class="section-header">
+                                    <i class="fas fa-user text-primary"></i>
+                                    <span>Veteran Information</span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group mb-3">
+                                            <label for="veteranName" class="form-label">Veteran Name *</label>
+                                            <InputText id="veteranName" class="form-control" @bind-Value="screening.VeteranName" />
+                                            <ValidationMessage For="() => screening.VeteranName" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medical History Review -->
+                            <div class="screening-section">
+                                <div class="section-header">
+                                    <i class="fas fa-file-medical text-primary"></i>
+                                    <span>Medical History Review</span>
+                                </div>
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran have PCP signature approval?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.HasPcpSignature == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasPcpSignature = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.HasPcpSignature == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasPcpSignature = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medical Assessment -->
+                            <div class="screening-section">
+                                <div class="section-header">
+                                    <i class="fas fa-stethoscope text-primary"></i>
+                                    <span>Medical Assessment</span>
+                                </div>
+                                
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran require oxygen?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresOxygen == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.RequiresOxygen = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresOxygen == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.RequiresOxygen = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran require insulin?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresInsulin == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.RequiresInsulin = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresInsulin == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.RequiresInsulin = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran take regular medications?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.TakesMedications == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.TakesMedications = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.TakesMedications == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.TakesMedications = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobility Evaluation -->
+                            <div class="screening-section">
+                                <div class="section-header">
+                                    <i class="fas fa-walking text-primary"></i>
+                                    <span>Mobility Evaluation</span>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran use an assistive device?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresAssistiveDevice == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => { screening.RequiresAssistiveDevice = true; }">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresAssistiveDevice == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => { screening.RequiresAssistiveDevice = false; screening.AssistiveDeviceType = null; }">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                @if (screening.RequiresAssistiveDevice == true)
+                                {
+                                    <div class="question-group">
+                                        <label class="question-label">Type of assistive device:</label>
+                                        <div class="device-grid">
+                                            @foreach (var deviceType in Enum.GetValues<AssistiveDeviceType>().Where(d => d != AssistiveDeviceType.None))
+                                            {
+                                                <button type="button" 
+                                                        class="btn device-btn @(screening.AssistiveDeviceType == deviceType ? "btn-primary" : "btn-outline-primary")"
+                                                        @onclick="() => screening.AssistiveDeviceType = deviceType">
+                                                    <i class="@GetDeviceIcon(deviceType) me-2"></i>
+                                                    @deviceType
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran have mobility limitations?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.HasMobilityLimitations == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasMobilityLimitations = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.HasMobilityLimitations == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasMobilityLimitations = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Can the veteran walk long distances?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.CanWalkLongDistances == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.CanWalkLongDistances = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.CanWalkLongDistances == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.CanWalkLongDistances = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Does the veteran require wheelchair access?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresWheelchairAccess == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.RequiresWheelchairAccess = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.RequiresWheelchairAccess == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => screening.RequiresWheelchairAccess = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post-Interview Review -->
+                            <div class="screening-section">
+                                <div class="section-header">
+                                    <i class="fas fa-exclamation-triangle text-primary"></i>
+                                    <span>Post-Interview Review</span>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Are there any medical alerts?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.HasMedicalAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasMedicalAlerts = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.HasMedicalAlerts == false ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasMedicalAlerts = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Are there any mobility alerts?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.HasMobilityAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasMobilityAlerts = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.HasMobilityAlerts == false ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasMobilityAlerts = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="question-group">
+                                    <label class="question-label">Are there any special alerts?</label>
+                                    <div class="btn-group-toggle d-flex gap-2">
+                                        <button type="button" 
+                                                class="btn @(screening.HasSpecialAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasSpecialAlerts = true">
+                                            YES
+                                        </button>
+                                        <button type="button" 
+                                                class="btn @(screening.HasSpecialAlerts == false ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => screening.HasSpecialAlerts = false">
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes Section -->
+                            <div class="screening-section">
+                                <div class="section-header">
+                                    <i class="fas fa-sticky-note text-primary"></i>
+                                    <span>Notes</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notes" class="form-label">Additional Notes</label>
+                                    <InputTextArea id="notes" 
+                                                   class="form-control" 
+                                                   rows="4" 
+                                                   maxlength="500"
+                                                   @bind-Value="screening.Notes" 
+                                                   @oninput="OnNotesInput" />
+                                    <div class="form-text">
+                                        <span class="@(notesLength > 450 ? "text-warning" : "text-muted")">
+                                            @notesLength / 500 characters
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancel
+                                </button>
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        Save Draft
+                                    </button>
+                                    <button type="button" class="btn btn-success" @onclick="CompleteScreening">
+                                        <i class="fas fa-check me-2"></i>
+                                        Complete
+                                    </button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    
+    private VeteranScreening screening = new VeteranScreening();
+    private string? currentUserId;
+    private int notesLength => screening?.Notes?.Length ?? 0;
+    private bool IsNewScreening => !Id.HasValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUserId = authState.User.Identity?.Name;
+
+        if (Id.HasValue && !string.IsNullOrEmpty(currentUserId))
+        {
+            var existingScreening = await ScreeningService.GetScreeningAsync(Id.Value, currentUserId);
+            if (existingScreening != null)
+            {
+                screening = existingScreening;
+            }
+            else
+            {
+                Navigation.NavigateTo("/screenings");
+            }
+        }
+    }
+
+    private async Task SaveScreening()
+    {
+        if (string.IsNullOrEmpty(currentUserId))
+            return;
+
+        if (IsNewScreening)
+        {
+            screening = await ScreeningService.CreateScreeningAsync(screening.VeteranName, currentUserId);
+        }
+        else
+        {
+            await ScreeningService.UpdateScreeningAsync(screening);
+        }
+        
+        await JSRuntime.InvokeVoidAsync("alert", "Screening saved successfully!");
+    }
+
+    private async Task CompleteScreening()
+    {
+        if (string.IsNullOrEmpty(currentUserId))
+            return;
+
+        await SaveScreening();
+        
+        if (!IsNewScreening)
+        {
+            await ScreeningService.CompleteScreeningAsync(screening.Id, currentUserId);
+        }
+        
+        Navigation.NavigateTo("/screenings");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/screenings");
+    }
+
+    private void OnNotesInput(ChangeEventArgs e)
+    {
+        screening.Notes = e.Value?.ToString() ?? string.Empty;
+        StateHasChanged();
+    }
+
+    private static string GetDeviceIcon(AssistiveDeviceType deviceType)
+    {
+        return deviceType switch
+        {
+            AssistiveDeviceType.Cane => "fas fa-blind",
+            AssistiveDeviceType.Walker => "fas fa-walking",
+            AssistiveDeviceType.Wheelchair => "fas fa-wheelchair",
+            AssistiveDeviceType.Scooter => "fas fa-motorcycle",
+            _ => "fas fa-question"
+        };
+    }
+}
