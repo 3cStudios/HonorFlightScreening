@@ -38,37 +38,32 @@ public class VeteranScreeningService
     /// <summary>
     /// Create a new veteran screening
     /// </summary>
-    public async Task<VeteranScreening> CreateScreeningAsync(string veteranName, string userId)
+    public async Task<VeteranScreening> CreateScreeningAsync(VeteranScreening veteranScreening)
     {
-        var screening = new VeteranScreening
-        {
-            VeteranName = veteranName,
-            UserId = userId,
-            CreatedDate = DateTime.UtcNow,
-            LastModified = DateTime.UtcNow
-        };
+        
+        veteranScreening.CreatedDate = DateTime.UtcNow;
 
-        _context.VeteranScreenings.Add(screening);
+        _context.VeteranScreenings.Add(veteranScreening);
         await _context.SaveChangesAsync();
 
-        return screening;
+        return veteranScreening;
     }
 
     /// <summary>
     /// Update an existing screening
     /// </summary>
-    public async Task<bool> UpdateScreeningAsync(VeteranScreening screening)
+    public async Task<VeteranScreening> UpdateScreeningAsync(VeteranScreening veteranScreening)
     {
         try
         {
-            screening.LastModified = DateTime.UtcNow;
-            _context.VeteranScreenings.Update(screening);
+            veteranScreening.LastModified = DateTime.UtcNow;
+            _context.VeteranScreenings.Update(veteranScreening);
             await _context.SaveChangesAsync();
-            return true;
+            return veteranScreening;
         }
         catch
         {
-            return false;
+            return new VeteranScreening();
         }
     }
 

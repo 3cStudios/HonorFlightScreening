@@ -26,7 +26,7 @@ public class VeteranScreeningServiceTests
         var userId = "user123";
 
         // Act
-        var result = await service.CreateScreeningAsync(veteranName, userId);
+        var result = await service.CreateScreeningAsync(veteranName);
 
         // Assert
         Assert.IsNotNull(result);
@@ -43,9 +43,9 @@ public class VeteranScreeningServiceTests
         var service = new VeteranScreeningService(context);
         var userId = "user123";
 
-        await service.CreateScreeningAsync("John Doe", userId);
-        await service.CreateScreeningAsync("Jane Smith", userId);
-        await service.CreateScreeningAsync("Bob Wilson", "otheruser");
+        await service.CreateScreeningAsync("John Doe");
+        await service.CreateScreeningAsync("Jane Smith");
+        await service.CreateScreeningAsync("Bob Wilson");
 
         // Act
         var result = await service.GetUserScreeningsAsync(userId);
@@ -63,7 +63,7 @@ public class VeteranScreeningServiceTests
         var service = new VeteranScreeningService(context);
         var userId = "user123";
 
-        var screening = await service.CreateScreeningAsync("John Doe", userId);
+        var screening = await service.CreateScreeningAsync("John Doe");
 
         // Act
         var result = await service.CompleteScreeningAsync(screening.Id, userId);
@@ -97,7 +97,7 @@ public class VeteranScreeningServiceTests
         var service = new VeteranScreeningService(context);
         var userId = "user123";
 
-        var screening = await service.CreateScreeningAsync("John Doe", userId);
+        var screening = await service.CreateScreeningAsync("John Doe");
         var originalLastModified = screening.LastModified;
 
         // Wait a small amount to ensure time difference
