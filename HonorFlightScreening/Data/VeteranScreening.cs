@@ -1,3 +1,4 @@
+using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 
 namespace HonorFlightScreening.Data;
@@ -12,7 +13,13 @@ public class VeteranScreening
     [Required]
     [StringLength(250)]
     public string VeteranName { get; set; } = string.Empty;
-    
+    [Required]
+    [StringLength(250)]
+    public string GuardianName { get; set; } = string.Empty;
+    [Required]
+    [StringLength(12)]
+    public string GuardianPhone { get; set; } = string.Empty;
+
     [Required]
     [StringLength(50)]
     public string SoundOffNumber { get; set; } = string.Empty;
@@ -48,7 +55,13 @@ public class VeteranScreening
     public bool? HasMedicalAlerts { get; set; }
     public bool? HasMobilityAlerts { get; set; }
     public bool? HasSpecialAlerts { get; set; }
-    
+    [StringLength(500)]
+    public string SpecialAlertsDetails { get; set; } = string.Empty;
+    [StringLength(500)]
+    public string MobilityAlertsDetails { get; set; } = string.Empty;
+    [StringLength(500)]
+    public string? LiftRequired { get; set; }
+
     [StringLength(500)]
     public string Notes { get; set; } = string.Empty;
     

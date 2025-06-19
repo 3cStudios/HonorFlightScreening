@@ -65,8 +65,30 @@
                                     <div class="col-3">
                                         <div class=" mb-3">
                                             <label for="SoundOffNumber" class="form-label">Sound-Off Number *</label>
-                                            <InputText id="SoundOffNumber" class="form-control" @bind-Value="_screening.SoundOffNumber" />
+                                            <InputSelect id="SoundOffNumber" class="form-control" @bind-Value="_screening.SoundOffNumber">
+                                                <option value="">Select...</option>
+                                                @for (var i = 1; i <= 50; i++)
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            </InputSelect>
                                             <ValidationMessage For="() => _screening.SoundOffNumber" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-9">
+                                        <div class="mb-3">
+                                            <label for="GuardianName" class="form-label">Guardian Name *</label>
+                                            <InputText id="GuardianName" class="form-control" @bind-Value="_screening.GuardianName" />
+                                            <ValidationMessage For="() => _screening.GuardianName" />
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class=" mb-3">
+                                            <label for="GuardianName" class="form-label">Guardian Phone *</label>
+                                            <InputText id="GuardianPhone" class="form-control" @bind-Value="_screening.GuardianPhone" />
+                                            <ValidationMessage For="() => _screening.GuardianPhone" />
                                         </div>
                                     </div>
                                 </div>
@@ -289,6 +311,19 @@
 
                                 <div class="question-group">
                                     <label class="question-label">Are there any medical alerts?</label>
+                                    @{
+                                        if (_screening.UseOxygen is true 
+                                            || _screening.UseInsulin is true 
+                                            || _screening.FluidPills is true 
+                                            || _screening.MedicalConcerns is true)
+                                        {
+                                            _screening.HasMedicalAlerts = true;
+                                        }
+                                        else
+                                        {
+                                            _screening.HasMedicalAlerts = false;
+                                        }
+                                    }
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
                                                 class="btn @(_screening.HasMedicalAlerts == true ? "btn-warning" : "btn-outline-secondary")"
@@ -305,7 +340,19 @@
 
                                 <div class="question-group">
                                     <label class="question-label">Are there any mobility alerts?</label>
-                                    <div class="btn-group-toggle d-flex gap-2">
+                                    @{
+                                        if (_screening.RequiresAssistiveDevice is true
+                                        || _screening.ConcernsWalkingStairsBus is true
+                                        || _screening.ConcernsFlying is true)
+                                        {
+                                            _screening.HasMobilityAlerts = true;
+                                        }
+                                        else
+                                        {
+                                            _screening.HasMobilityAlerts = false;
+                                        }
+                                    }
+                                    <div class="btn-group-toggle d-flex gap-2 mb-3">
                                         <button type="button" 
                                                 class="btn @(_screening.HasMobilityAlerts == true ? "btn-warning" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.HasMobilityAlerts = true">
@@ -317,6 +364,28 @@
                                             NO
                                         </button>
                                     </div>
+                                    @if (_screening.HasMobilityAlerts == true)
+                                    {
+                                        <label class="question-label">Is a lift required?</label>
+                                        <div class="btn-group-toggle d-flex gap-2 mb-3">
+                                            
+                                            <button type="button"
+                                                    class="btn @(_screening.LiftRequired == Yes ? "btn-warning" : "btn-outline-secondary")"
+                                                    @onclick="SetLiftRequiredYes">
+                                                YES
+                                            </button>
+                                            <button type="button"
+                                                    class="btn @(_screening.LiftRequired == No ? "btn-success" : "btn-outline-secondary")"
+                                                    @onclick="SetLiftRequiredNo">
+                                                NO
+                                            </button>
+                                            <button type="button"
+                                                    class="btn @(_screening.LiftRequired == Maybe ? "btn-warning" : "btn-outline-secondary")"
+                                                    @onclick="SetLiftRequiredMaybe">
+                                                Maybe
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
 
                                 <div class="question-group">
@@ -333,6 +402,15 @@
                                             NO
                                         </button>
                                     </div>
+                                    @if (_screening.HasSpecialAlerts == true)
+                                    {
+                                        <div class="mb-3 mt-3">
+                                            <label for="specialAlertDetail" class="form-label">Special Alerts Details:</label>
+                                            <InputText id="specialAlertDetail" 
+                                                       class="form-control" 
+                                                       @bind-Value="_screening.SpecialAlertsDetails" />
+                                        </div>
+                                    }
                                 </div>
                             </div>
 
@@ -387,6 +465,9 @@
     private string? _currentUserId;
     private int NotesLength => _screening?.Notes?.Length ?? 0;
     private bool IsNewScreening => !Id.HasValue;
+    const string Yes ="Yes";
+    const string No ="No";
+    const string Maybe = "Maybe";
 
     protected override async Task OnInitializedAsync()
     {
@@ -435,6 +516,19 @@
     {
         _screening.Notes = e.Value?.ToString() ?? string.Empty;
         StateHasChanged();
+    }
+
+    private void SetLiftRequiredYes()
+    {
+        _screening.LiftRequired = Yes;
+    }
+    private void SetLiftRequiredNo()
+    {
+        _screening.LiftRequired = No;
+    }
+    private void SetLiftRequiredMaybe()
+    {
+        _screening.LiftRequired = Maybe;
     }
 
     private static string GetDeviceIcon(AssistiveDeviceType deviceType)
