@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using HonorFlightScreening.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace HonorFlightScreening.Services;
 
@@ -9,12 +9,12 @@ namespace HonorFlightScreening.Services;
 public class VeteranScreeningService
 {
     private readonly ApplicationDbContext _context;
-    
+
     public VeteranScreeningService(ApplicationDbContext context)
     {
         _context = context;
     }
-    
+
     /// <summary>
     /// Get all screenings for a specific user
     /// </summary>
@@ -25,7 +25,7 @@ public class VeteranScreeningService
             .OrderByDescending(s => s.LastModified)
             .ToListAsync();
     }
-    
+
     /// <summary>
     /// Get a specific screening by ID
     /// </summary>
@@ -34,7 +34,7 @@ public class VeteranScreeningService
         return await _context.VeteranScreenings
             .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
     }
-    
+
     /// <summary>
     /// Create a new veteran screening
     /// </summary>
@@ -47,13 +47,13 @@ public class VeteranScreeningService
             CreatedDate = DateTime.UtcNow,
             LastModified = DateTime.UtcNow
         };
-        
+
         _context.VeteranScreenings.Add(screening);
         await _context.SaveChangesAsync();
-        
+
         return screening;
     }
-    
+
     /// <summary>
     /// Update an existing screening
     /// </summary>
@@ -71,7 +71,7 @@ public class VeteranScreeningService
             return false;
         }
     }
-    
+
     /// <summary>
     /// Delete a screening
     /// </summary>
@@ -80,12 +80,12 @@ public class VeteranScreeningService
         var screening = await GetScreeningAsync(id, userId);
         if (screening == null)
             return false;
-            
+
         _context.VeteranScreenings.Remove(screening);
         await _context.SaveChangesAsync();
         return true;
     }
-    
+
     /// <summary>
     /// Mark screening as completed
     /// </summary>
@@ -94,10 +94,10 @@ public class VeteranScreeningService
         var screening = await GetScreeningAsync(id, userId);
         if (screening == null)
             return false;
-            
+
         screening.Status = ScreeningStatus.Completed;
         screening.LastModified = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();
         return true;
     }

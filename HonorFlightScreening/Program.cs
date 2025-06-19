@@ -1,12 +1,43 @@
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using HonorFlightScreening;
 using HonorFlightScreening.Components;
 using HonorFlightScreening.Components.Account;
 using HonorFlightScreening.Data;
+using HonorFlightScreening.Helper;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
+// Add services to the container.
+var configuration = builder.Configuration;
 
+if (Environment.GetEnvironmentVariable("3cAzureAppConfig") is null)
+{
+    //Throw error
+    throw new Exception(
+        "The AzureAppConfig env variable is missing that is required to read variables from Azure App Configuration");
+}
+string? hostingEnvironmentName = null;
+builder.Logging.AddConfiguration(configuration.GetSection("Logging"));
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+hostingEnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+configuration.AddAzureAppConfiguration(options =>
+    options
+        .Connect(Environment.GetEnvironmentVariable("3cAzureAppConfig"))
+        .Select("Global.*", LabelFilter.Null)
+        .Select(Constants.ConfigAppServiceName + ".*", LabelFilter.Null)
+        .Select("Global.*", hostingEnvironmentName)
+        .Select(Constants.ConfigAppServiceName + ".*",
+            hostingEnvironmentName)
+
+
+);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -23,10 +54,24 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        options.UseSqlServer(configuration["HonorFlightScreening.ConnectionString"],
+            providerOptions =>
+            {
+                providerOptions.EnableRetryOnFailure(
+                    maxRetryCount: 30, // Maximum number of retry attempts
+                    maxRetryDelay: TimeSpan.FromSeconds(30), // Maximum delay between retries
+                    errorNumbersToAdd: null); // Additional error numbers to consider for retry); 
+            }),
+    ServiceLifetime.Transient);
+
+
+
+builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions()
+    { ConnectionString = $"{configuration["HonorFlightScreening.ApplicationInsights"]}" });
+
+builder.Services.AddSingleton<ITelemetryInitializer, MyTelemetryInitializer>();
+
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()

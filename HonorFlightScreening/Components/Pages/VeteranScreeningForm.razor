@@ -1,19 +1,19 @@
 @page "/screening/new"
 @page "/screening/{Id:int}"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
 @using HonorFlightScreening.Data
 @using HonorFlightScreening.Services
+@rendermode InteractiveServer
 @attribute [Authorize]
 @inject VeteranScreeningService ScreeningService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@(IsNewScreening ? "New" : "Edit") Veteran Screening</PageTitle>
 
 <div class="container-fluid">
-    @if (screening == null && !IsNewScreening)
+    @if (_screening == null && !IsNewScreening)
     {
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="card-body">
-                        <EditForm Model="screening" OnValidSubmit="SaveScreening">
+                        <EditForm Model="_screening" OnValidSubmit="SaveScreening">
                             <DataAnnotationsValidator />
                             <ValidationSummary class="alert alert-danger" />
 
@@ -58,8 +58,8 @@
                                     <div class="col-12">
                                         <div class="form-group mb-3">
                                             <label for="veteranName" class="form-label">Veteran Name *</label>
-                                            <InputText id="veteranName" class="form-control" @bind-Value="screening.VeteranName" />
-                                            <ValidationMessage For="() => screening.VeteranName" />
+                                            <InputText id="veteranName" class="form-control" @bind-Value="_screening.VeteranName" />
+                                            <ValidationMessage For="() => _screening.VeteranName" />
                                         </div>
                                     </div>
                                 </div>
@@ -75,13 +75,13 @@
                                     <label class="question-label">Does the veteran have PCP signature approval?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.HasPcpSignature == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasPcpSignature = true">
+                                                class="btn @(_screening.HasPcpSignature == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasPcpSignature = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.HasPcpSignature == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasPcpSignature = false">
+                                                class="btn @(_screening.HasPcpSignature == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasPcpSignature = false">
                                             NO
                                         </button>
                                     </div>
@@ -99,13 +99,13 @@
                                     <label class="question-label">Does the veteran require oxygen?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.RequiresOxygen == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.RequiresOxygen = true">
+                                                class="btn @(_screening.RequiresOxygen == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.RequiresOxygen = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.RequiresOxygen == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.RequiresOxygen = false">
+                                                class="btn @(_screening.RequiresOxygen == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.RequiresOxygen = false">
                                             NO
                                         </button>
                                     </div>
@@ -115,13 +115,13 @@
                                     <label class="question-label">Does the veteran require insulin?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.RequiresInsulin == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.RequiresInsulin = true">
+                                                class="btn @(_screening.RequiresInsulin == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.RequiresInsulin = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.RequiresInsulin == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.RequiresInsulin = false">
+                                                class="btn @(_screening.RequiresInsulin == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.RequiresInsulin = false">
                                             NO
                                         </button>
                                     </div>
@@ -131,13 +131,13 @@
                                     <label class="question-label">Does the veteran take regular medications?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.TakesMedications == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.TakesMedications = true">
+                                                class="btn @(_screening.TakesMedications == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.TakesMedications = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.TakesMedications == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.TakesMedications = false">
+                                                class="btn @(_screening.TakesMedications == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.TakesMedications = false">
                                             NO
                                         </button>
                                     </div>
@@ -155,19 +155,19 @@
                                     <label class="question-label">Does the veteran use an assistive device?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.RequiresAssistiveDevice == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => { screening.RequiresAssistiveDevice = true; }">
+                                                class="btn @(_screening.RequiresAssistiveDevice == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => { _screening.RequiresAssistiveDevice = true; }">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.RequiresAssistiveDevice == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => { screening.RequiresAssistiveDevice = false; screening.AssistiveDeviceType = null; }">
+                                                class="btn @(_screening.RequiresAssistiveDevice == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => { _screening.RequiresAssistiveDevice = false; _screening.AssistiveDeviceType = null; }">
                                             NO
                                         </button>
                                     </div>
                                 </div>
 
-                                @if (screening.RequiresAssistiveDevice == true)
+                                @if (_screening.RequiresAssistiveDevice == true)
                                 {
                                     <div class="question-group">
                                         <label class="question-label">Type of assistive device:</label>
@@ -175,8 +175,8 @@
                                             @foreach (var deviceType in Enum.GetValues<AssistiveDeviceType>().Where(d => d != AssistiveDeviceType.None))
                                             {
                                                 <button type="button" 
-                                                        class="btn device-btn @(screening.AssistiveDeviceType == deviceType ? "btn-primary" : "btn-outline-primary")"
-                                                        @onclick="() => screening.AssistiveDeviceType = deviceType">
+                                                        class="btn device-btn @(_screening.AssistiveDeviceType == deviceType ? "btn-primary" : "btn-outline-primary")"
+                                                        @onclick="() => _screening.AssistiveDeviceType = deviceType">
                                                     <i class="@GetDeviceIcon(deviceType) me-2"></i>
                                                     @deviceType
                                                 </button>
@@ -189,13 +189,13 @@
                                     <label class="question-label">Does the veteran have mobility limitations?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.HasMobilityLimitations == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasMobilityLimitations = true">
+                                                class="btn @(_screening.HasMobilityLimitations == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasMobilityLimitations = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.HasMobilityLimitations == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasMobilityLimitations = false">
+                                                class="btn @(_screening.HasMobilityLimitations == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasMobilityLimitations = false">
                                             NO
                                         </button>
                                     </div>
@@ -205,13 +205,13 @@
                                     <label class="question-label">Can the veteran walk long distances?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.CanWalkLongDistances == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.CanWalkLongDistances = true">
+                                                class="btn @(_screening.CanWalkLongDistances == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.CanWalkLongDistances = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.CanWalkLongDistances == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.CanWalkLongDistances = false">
+                                                class="btn @(_screening.CanWalkLongDistances == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.CanWalkLongDistances = false">
                                             NO
                                         </button>
                                     </div>
@@ -221,13 +221,13 @@
                                     <label class="question-label">Does the veteran require wheelchair access?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.RequiresWheelchairAccess == true ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.RequiresWheelchairAccess = true">
+                                                class="btn @(_screening.RequiresWheelchairAccess == true ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.RequiresWheelchairAccess = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.RequiresWheelchairAccess == false ? "btn-danger" : "btn-outline-secondary")"
-                                                @onclick="() => screening.RequiresWheelchairAccess = false">
+                                                class="btn @(_screening.RequiresWheelchairAccess == false ? "btn-danger" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.RequiresWheelchairAccess = false">
                                             NO
                                         </button>
                                     </div>
@@ -245,13 +245,13 @@
                                     <label class="question-label">Are there any medical alerts?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.HasMedicalAlerts == true ? "btn-warning" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasMedicalAlerts = true">
+                                                class="btn @(_screening.HasMedicalAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasMedicalAlerts = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.HasMedicalAlerts == false ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasMedicalAlerts = false">
+                                                class="btn @(_screening.HasMedicalAlerts == false ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasMedicalAlerts = false">
                                             NO
                                         </button>
                                     </div>
@@ -261,13 +261,13 @@
                                     <label class="question-label">Are there any mobility alerts?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.HasMobilityAlerts == true ? "btn-warning" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasMobilityAlerts = true">
+                                                class="btn @(_screening.HasMobilityAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasMobilityAlerts = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.HasMobilityAlerts == false ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasMobilityAlerts = false">
+                                                class="btn @(_screening.HasMobilityAlerts == false ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasMobilityAlerts = false">
                                             NO
                                         </button>
                                     </div>
@@ -277,13 +277,13 @@
                                     <label class="question-label">Are there any special alerts?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button" 
-                                                class="btn @(screening.HasSpecialAlerts == true ? "btn-warning" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasSpecialAlerts = true">
+                                                class="btn @(_screening.HasSpecialAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasSpecialAlerts = true">
                                             YES
                                         </button>
                                         <button type="button" 
-                                                class="btn @(screening.HasSpecialAlerts == false ? "btn-success" : "btn-outline-secondary")"
-                                                @onclick="() => screening.HasSpecialAlerts = false">
+                                                class="btn @(_screening.HasSpecialAlerts == false ? "btn-success" : "btn-outline-secondary")"
+                                                @onclick="() => _screening.HasSpecialAlerts = false">
                                             NO
                                         </button>
                                     </div>
@@ -302,11 +302,11 @@
                                                    class="form-control" 
                                                    rows="4" 
                                                    maxlength="500"
-                                                   @bind-Value="screening.Notes" 
+                                                   @bind-Value="_screening.Notes" 
                                                    @oninput="OnNotesInput" />
                                     <div class="form-text">
-                                        <span class="@(notesLength > 450 ? "text-warning" : "text-muted")">
-                                            @notesLength / 500 characters
+                                        <span class="@(NotesLength > 450 ? "text-warning" : "text-muted")">
+                                            @NotesLength / 500 characters
                                         </span>
                                     </div>
                                 </div>
@@ -340,22 +340,22 @@
 @code {
     [Parameter] public int? Id { get; set; }
     
-    private VeteranScreening screening = new VeteranScreening();
-    private string? currentUserId;
-    private int notesLength => screening?.Notes?.Length ?? 0;
+    private VeteranScreening _screening = new();
+    private string? _currentUserId;
+    private int NotesLength => _screening?.Notes?.Length ?? 0;
     private bool IsNewScreening => !Id.HasValue;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        currentUserId = authState.User.Identity?.Name;
+        _currentUserId = authState.User.Identity?.Name;
 
-        if (Id.HasValue && !string.IsNullOrEmpty(currentUserId))
+        if (Id.HasValue && !string.IsNullOrEmpty(_currentUserId))
         {
-            var existingScreening = await ScreeningService.GetScreeningAsync(Id.Value, currentUserId);
+            var existingScreening = await ScreeningService.GetScreeningAsync(Id.Value, _currentUserId);
             if (existingScreening != null)
             {
-                screening = existingScreening;
+                _screening = existingScreening;
             }
             else
             {
@@ -366,31 +366,31 @@
 
     private async Task SaveScreening()
     {
-        if (string.IsNullOrEmpty(currentUserId))
+        if (string.IsNullOrEmpty(_currentUserId))
             return;
 
         if (IsNewScreening)
         {
-            screening = await ScreeningService.CreateScreeningAsync(screening.VeteranName, currentUserId);
+            _screening = await ScreeningService.CreateScreeningAsync(_screening.VeteranName, _currentUserId);
         }
         else
         {
-            await ScreeningService.UpdateScreeningAsync(screening);
+            await ScreeningService.UpdateScreeningAsync(_screening);
         }
         
-        await JSRuntime.InvokeVoidAsync("alert", "Screening saved successfully!");
+        await JsRuntime.InvokeVoidAsync("alert", "Screening saved successfully!");
     }
 
     private async Task CompleteScreening()
     {
-        if (string.IsNullOrEmpty(currentUserId))
+        if (string.IsNullOrEmpty(_currentUserId))
             return;
 
         await SaveScreening();
         
         if (!IsNewScreening)
         {
-            await ScreeningService.CompleteScreeningAsync(screening.Id, currentUserId);
+            await ScreeningService.CompleteScreeningAsync(_screening.Id, _currentUserId);
         }
         
         Navigation.NavigateTo("/screenings");
@@ -403,7 +403,7 @@
 
     private void OnNotesInput(ChangeEventArgs e)
     {
-        screening.Notes = e.Value?.ToString() ?? string.Empty;
+        _screening.Notes = e.Value?.ToString() ?? string.Empty;
         StateHasChanged();
     }
 

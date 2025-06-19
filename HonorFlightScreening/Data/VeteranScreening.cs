@@ -15,9 +15,9 @@ public class VeteranScreening
     
     public string UserId { get; set; } = string.Empty;
     
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
     
-    public DateTime LastModified { get; set; } = DateTime.UtcNow;
+    public DateTime? LastModified { get; set; } = DateTime.UtcNow;
     
     // Medical History Review
     public bool? HasPcpSignature { get; set; }

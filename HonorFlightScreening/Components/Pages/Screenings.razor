@@ -1,13 +1,15 @@
 @page "/screenings"
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
 @using HonorFlightScreening.Data
 @using HonorFlightScreening.Services
-@attribute [Authorize]
+
 @inject VeteranScreeningService ScreeningService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
+@rendermode InteractiveServer
+@attribute [Authorize]
+
 
 <PageTitle>Veteran Screenings</PageTitle>
 
@@ -19,13 +21,13 @@
                     <i class="fas fa-clipboard-list me-2"></i>
                     Veteran Screenings
                 </h1>
-                <button class="btn btn-primary" @onclick="CreateNewScreening">
+                <button type="button" class="btn btn-primary" @onclick="CreateNewScreening">
                     <i class="fas fa-plus me-2"></i>
                     New Screening
                 </button>
             </div>
 
-            @if (screenings == null)
+            @if (_screenings == null)
             {
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
@@ -33,14 +35,14 @@
                     </div>
                 </div>
             }
-            else if (!screenings.Any())
+            else if (!_screenings.Any())
             {
                 <div class="card">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">No screenings found</h5>
                         <p class="text-muted">Create your first veteran screening to get started.</p>
-                        <button class="btn btn-primary" @onclick="CreateNewScreening">
+                        <button type="button" class="btn btn-primary" @onclick="CreateNewScreening">
                             <i class="fas fa-plus me-2"></i>
                             Create First Screening
                         </button>
@@ -50,7 +52,7 @@
             else
             {
                 <div class="row">
-                    @foreach (var screening in screenings)
+                    @foreach (var screening in _screenings)
                     {
                         <div class="col-12 col-md-6 col-lg-4 mb-4">
                             <div class="card h-100 screening-card">
@@ -64,11 +66,11 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <small class="text-muted d-block">Created</small>
-                                            <p class="mb-2">@screening.CreatedDate.ToString("MMM dd, yyyy")</p>
+                                            @* <p class="mb-2">@screening.CreatedDate.ToString("MMM dd, yyyy")</p> *@
                                         </div>
                                         <div class="col-12">
                                             <small class="text-muted d-block">Last Modified</small>
-                                            <p class="mb-2">@screening.LastModified.ToString("MMM dd, yyyy HH:mm")</p>
+                                            @* <p class="mb-2">@screening.LastModified.ToString("MMM dd, yyyy HH:mm")</p> *@
                                         </div>
                                         @if (!string.IsNullOrEmpty(screening.Notes))
                                         {
@@ -103,23 +105,24 @@
 </div>
 
 @code {
-    private List<VeteranScreening>? screenings;
-    private string? currentUserId;
+    private List<VeteranScreening>? _screenings;
+    private string? _currentUserId;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        currentUserId = authState.User.Identity?.Name;
+        _currentUserId = authState.User.Identity?.Name;
         
-        if (!string.IsNullOrEmpty(currentUserId))
+        if (!string.IsNullOrEmpty(_currentUserId))
         {
-            screenings = await ScreeningService.GetUserScreeningsAsync(currentUserId);
+            _screenings = await ScreeningService.GetUserScreeningsAsync(_currentUserId);
         }
     }
 
-    private async Task CreateNewScreening()
+    private void CreateNewScreening()
     {
-        await Task.Run(() => Navigation.NavigateTo("/screening/new"));
+        Navigation.NavigateTo("/screening/new");
+        
     }
 
     private void EditScreening(int id)
@@ -129,11 +132,11 @@
 
     private async Task DeleteScreening(int id)
     {
-        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this screening?");
-        if (confirmed && !string.IsNullOrEmpty(currentUserId))
+        var confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this screening?");
+        if (confirmed && !string.IsNullOrEmpty(_currentUserId))
         {
-            await ScreeningService.DeleteScreeningAsync(id, currentUserId);
-            screenings = await ScreeningService.GetUserScreeningsAsync(currentUserId);
+            await ScreeningService.DeleteScreeningAsync(id, _currentUserId);
+            _screenings = await ScreeningService.GetUserScreeningsAsync(_currentUserId);
             StateHasChanged();
         }
     }
