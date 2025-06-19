@@ -4,6 +4,7 @@ using HonorFlightScreening.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HonorFlightScreening.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250619215053_UpdateVeteranScreening2")]
+    partial class UpdateVeteranScreening2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,8 +135,7 @@ namespace HonorFlightScreening.Migrations
 
                     b.Property<string>("HowMuchOxygen")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
@@ -143,8 +145,7 @@ namespace HonorFlightScreening.Migrations
 
                     b.Property<string>("MedicalConcernsDetails")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .IsRequired()
@@ -153,11 +154,6 @@ namespace HonorFlightScreening.Migrations
 
                     b.Property<bool?>("RequiresAssistiveDevice")
                         .HasColumnType("bit");
-
-                    b.Property<string>("SoundOffNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool?>("UseInsulin")
                         .HasColumnType("bit");
@@ -171,7 +167,7 @@ namespace HonorFlightScreening.Migrations
 
                     b.Property<string>("VeteranName")
                         .IsRequired()
-                        .HasMaxLength(250)
+                        .HasMaxLength(100)
                         .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");

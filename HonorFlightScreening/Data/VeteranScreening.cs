@@ -10,9 +10,13 @@ public class VeteranScreening
     public int Id { get; set; }
     
     [Required]
-    [StringLength(100)]
+    [StringLength(250)]
     public string VeteranName { get; set; } = string.Empty;
     
+    [Required]
+    [StringLength(50)]
+    public string SoundOffNumber { get; set; } = string.Empty;
+
     public string UserId { get; set; } = string.Empty;
     
     public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
@@ -23,16 +27,22 @@ public class VeteranScreening
     public bool? HasPcpSignature { get; set; }
     
     // Medical Assessment
-    public bool? RequiresOxygen { get; set; }
-    public bool? RequiresInsulin { get; set; }
-    public bool? TakesMedications { get; set; }
-    
+    public bool? UseOxygen { get; set; }
+    [StringLength(500)]
+    public string HowMuchOxygen{ get; set; } = string.Empty;
+    public bool? UseInsulin { get; set; }
+    public bool? HelpWithInsulin { get; set; }
+    public bool? FluidPills { get; set; }
+    public bool? MedicalConcerns { get; set; }
+    [StringLength(500)]
+    public string MedicalConcernsDetails { get; set; } = string.Empty;
+
     // Mobility Evaluation
     public bool? RequiresAssistiveDevice { get; set; }
     public AssistiveDeviceType? AssistiveDeviceType { get; set; }
     public bool? HasMobilityLimitations { get; set; }
-    public bool? CanWalkLongDistances { get; set; }
-    public bool? RequiresWheelchairAccess { get; set; }
+    public bool? ConcernsWalkingStairsBus { get; set; }
+    public bool? ConcernsFlying { get; set; }
     
     // Post-Interview Review
     public bool? HasMedicalAlerts { get; set; }
@@ -42,9 +52,7 @@ public class VeteranScreening
     [StringLength(500)]
     public string Notes { get; set; } = string.Empty;
     
-    public ScreeningStatus Status { get; set; } = ScreeningStatus.InProgress;
-    
-    public bool IsCompleted => Status == ScreeningStatus.Completed;
+        
 }
 
 /// <summary>
@@ -59,12 +67,3 @@ public enum AssistiveDeviceType
     Scooter = 4
 }
 
-/// <summary>
-/// Status of the veteran screening process
-/// </summary>
-public enum ScreeningStatus
-{
-    InProgress = 0,
-    Completed = 1,
-    Reviewed = 2
-}
