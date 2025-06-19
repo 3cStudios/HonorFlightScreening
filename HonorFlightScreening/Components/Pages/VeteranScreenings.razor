@@ -1,0 +1,299 @@
+﻿@page "/VeteranScreenings"
+@using HonorFlightScreening.Data
+@using HonorFlightScreening.Services
+@using Microsoft.AspNetCore.Authorization
+@inject VeteranScreeningService ScreeningService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Veteran Screenings</PageTitle>
+
+<div class="container-fluid">
+    <h2 class="mb-4">Veteran Screenings</h2>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        <button type="button" class="btn p-0 fw-bold" @onclick='() => OnSort("VeteranName")'>
+                            Name @((MarkupString)GetSortIcon("VeteranName"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn p-0 fw-bold" @onclick='() => OnSort("SoundOffNumber")'>
+                            Sound-Off @((MarkupString)GetSortIcon("SoundOffNumber"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn p-0 fw-bold" @onclick='() => OnSort("HasMedicalAlerts")'>
+                            Medical Alerts @((MarkupString)GetSortIcon("HasMedicalAlerts"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn  p-0 fw-bold" @onclick='() => OnSort("HasMobilityAlerts")'>
+                            Mobility Alerts @((MarkupString)GetSortIcon("HasMobilityAlerts"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn  p-0 fw-bold" @onclick='() => OnSort("HasSpecialAlerts")'>
+                            Special Alerts @((MarkupString)GetSortIcon("HasSpecialAlerts"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn  p-0 fw-bold" @onclick='() => OnSort("AssistiveDeviceType")'>
+                            Assistive Device @((MarkupString)GetSortIcon("AssistiveDeviceType"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn  p-0 fw-bold" @onclick='() => OnSort("LiftRequired")'>
+                            Lift Required @((MarkupString)GetSortIcon("LiftRequired"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn  p-0 fw-bold" @onclick='() => OnSort("UseOxygen")'>
+                            Use Oxygen @((MarkupString)GetSortIcon("UseOxygen"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn  p-0 fw-bold" @onclick='() => OnSort("HowMuchOxygen")'>
+                            How Much Oxygen @((MarkupString)GetSortIcon("HowMuchOxygen"))
+                        </button>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <div class="input-group input-group-sm">
+                            <input class="form-control" @bind="_searchVeteranName" placeholder="Search..." />
+                            @if (!_veteranNameFilterApplied)
+                            {
+                                <button class="btn btn-primary" @onclick="ApplyVeteranNameFilter">Go</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary" @onclick="ClearVeteranNameFilter">Clear</button>
+                            }
+                        </div>
+                    </th>
+                    <th>
+                        <div class="input-group input-group-sm">
+                            <input class="form-control" @bind="_searchSoundOffNumber" placeholder="Search..." />
+                            @if (!_soundOffNumberFilterApplied)
+                            {
+                                <button class="btn btn-primary" @onclick="ApplySoundOffNumberFilter">Go</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary" @onclick="ClearSoundOffNumberFilter">Clear</button>
+                            }
+                        </div>
+                    </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_filteredScreenings != null)
+                {
+                    @foreach (var screening in _filteredScreenings)
+                    {
+                        <tr style="cursor:pointer" @onclick="() => NavigateToScreening(screening.Id)">
+                            <td>@screening.VeteranName</td>
+                            <td>@screening.SoundOffNumber</td>
+                            <td>@(screening.HasMedicalAlerts == true ? "Yes" : "No")</td>
+                            <td>@(screening.HasMobilityAlerts == true ? "Yes" : "No")</td>
+                            <td>@(screening.HasSpecialAlerts == true ? "Yes" : "No")</td>
+                            <td>@(screening.AssistiveDeviceType?.ToString() ?? "")</td>
+                            <td>@screening.LiftRequired</td>
+                            <td>@(screening.UseOxygen == true ? "Yes" : "No")</td>
+                            <td>@screening.HowMuchOxygen</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <h5>Summary</h5>
+        <ul>
+            <li>Total Use Oxygen: @_summaryUseOxygen</li>
+            <li>Total Lift Required (Yes): @_summaryLiftRequiredYes</li>
+            <li>Total Medical Alerts: @_summaryMedicalAlerts</li>
+            <li>Total Mobility Alerts: @_summaryMobilityAlerts</li>
+            <li>Total Special Alerts: @_summarySpecialAlerts</li>
+        </ul>
+    </div>
+</div>
+
+@code {
+    private List<VeteranScreening>? _screenings;
+    private List<VeteranScreening>? _filteredScreenings;
+
+    private string? _searchVeteranName;
+    private string? _searchSoundOffNumber;
+    private string _sortColumn = "VeteranName";
+    private Dictionary<string, bool> _sortAscendingByColumn = new()
+    {
+        { "VeteranName", true },
+        { "SoundOffNumber", true },
+        { "HasMedicalAlerts", true },
+        { "HasMobilityAlerts", true },
+        { "HasSpecialAlerts", true },
+        { "AssistiveDeviceType", true },
+        { "LiftRequired", true },
+        { "UseOxygen", true },
+        { "HowMuchOxygen", true }
+    };
+
+    private bool _veteranNameFilterApplied;
+    private bool _soundOffNumberFilterApplied;
+
+    private int _summaryUseOxygen;
+    private int _summaryLiftRequiredYes;
+    private int _summaryMedicalAlerts;
+    private int _summaryMobilityAlerts;
+    private int _summarySpecialAlerts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _screenings = await ScreeningService.GetAllScreeningsAsync();
+        _filteredScreenings = _screenings.ToList();
+        
+        CalculateSummary();
+    }
+
+    protected override void OnParametersSet()
+    {
+       CalculateSummary();
+    }
+
+    private void ApplyFilter()
+    {
+        if (_screenings == null)
+        {
+            _filteredScreenings = new List<VeteranScreening>();
+            return;
+        }
+        if (string.IsNullOrEmpty(_searchVeteranName) &&
+            string.IsNullOrEmpty(_searchSoundOffNumber))
+        {
+            _filteredScreenings = _screenings.ToList();
+            return;
+        }
+        IEnumerable<VeteranScreening> query = _screenings;
+        if (!string.IsNullOrWhiteSpace(_searchVeteranName))
+            query = query.Where(s => s.VeteranName.Contains(_searchVeteranName, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(_searchSoundOffNumber))
+            query = query.Where(s => s.SoundOffNumber.Contains(_searchSoundOffNumber, StringComparison.OrdinalIgnoreCase));
+        _filteredScreenings = query.ToList();
+        
+    }
+
+    private void ApplySort()
+    {
+        if (_filteredScreenings == null)
+        {
+            return;
+        }
+        var ascending = !_sortAscendingByColumn.TryGetValue(_sortColumn, out var asc) || asc;
+        _filteredScreenings = _sortColumn switch
+        {
+            "VeteranName" => ascending ? _filteredScreenings.OrderBy(s => s.VeteranName).ToList() : _filteredScreenings.OrderByDescending(s => s.VeteranName).ToList(),
+            "SoundOffNumber" => ascending ? _filteredScreenings.OrderBy(s => s.SoundOffNumber).ToList() : _filteredScreenings.OrderByDescending(s => s.SoundOffNumber).ToList(),
+            "HasMedicalAlerts" => ascending ? _filteredScreenings.OrderBy(s => s.HasMedicalAlerts).ToList() : _filteredScreenings.OrderByDescending(s => s.HasMedicalAlerts).ToList(),
+            "HasMobilityAlerts" => ascending ? _filteredScreenings.OrderBy(s => s.HasMobilityAlerts).ToList() : _filteredScreenings.OrderByDescending(s => s.HasMobilityAlerts).ToList(),
+            "HasSpecialAlerts" => ascending ? _filteredScreenings.OrderBy(s => s.HasSpecialAlerts).ToList() : _filteredScreenings.OrderByDescending(s => s.HasSpecialAlerts).ToList(),
+            "AssistiveDeviceType" => ascending ? _filteredScreenings.OrderBy(s => s.AssistiveDeviceType).ToList() : _filteredScreenings.OrderByDescending(s => s.AssistiveDeviceType).ToList(),
+            "LiftRequired" => ascending ? _filteredScreenings.OrderBy(s => s.LiftRequired).ToList() : _filteredScreenings.OrderByDescending(s => s.LiftRequired).ToList(),
+            "UseOxygen" => ascending ? _filteredScreenings.OrderBy(s => s.UseOxygen).ToList() : _filteredScreenings.OrderByDescending(s => s.UseOxygen).ToList(),
+            "HowMuchOxygen" => ascending ? _filteredScreenings.OrderBy(s => s.HowMuchOxygen).ToList() : _filteredScreenings.OrderByDescending(s => s.HowMuchOxygen).ToList(),
+            _ => _filteredScreenings
+        };
+    }
+
+    
+    private void CalculateSummary()
+    {
+        if (_filteredScreenings == null)
+        {
+            _summaryUseOxygen = _summaryLiftRequiredYes = _summaryMedicalAlerts = _summaryMobilityAlerts = _summarySpecialAlerts = 0;
+            return;
+        }
+        _summaryUseOxygen = _filteredScreenings.Count(s => s.UseOxygen == true);
+        _summaryLiftRequiredYes = _filteredScreenings.Count(s => string.Equals(s.LiftRequired, "Yes", StringComparison.OrdinalIgnoreCase));
+        _summaryMedicalAlerts = _filteredScreenings.Count(s => s.HasMedicalAlerts == true);
+        _summaryMobilityAlerts = _filteredScreenings.Count(s => s.HasMobilityAlerts == true);
+        _summarySpecialAlerts = _filteredScreenings.Count(s => s.HasSpecialAlerts == true);
+    }
+
+    private void NavigateToScreening(int id)
+    {
+        Navigation.NavigateTo($"/screening/{id}");
+    }
+
+    private string GetSortIcon(string column)
+    {
+        var ascending = !_sortAscendingByColumn.TryGetValue(column, out var asc) || asc;
+        var icon = ascending ? " ▲" : " ▼";
+        return _sortColumn == column ? $"<span style='font-weight:bold'>{icon}</span>" : $"<span class='text-muted'>{icon}</span>";
+    }
+
+    private void OnSort(string column)
+    {
+        if (_sortColumn == column)
+        {
+            _sortAscendingByColumn[column] = !_sortAscendingByColumn[column];
+        }
+        else
+        {
+            _sortColumn = column;
+            if (!_sortAscendingByColumn.ContainsKey(column))
+                _sortAscendingByColumn[column] = true;
+        }
+        ApplySort();
+    }
+
+    
+    private void ApplyVeteranNameFilter()
+    {
+        _veteranNameFilterApplied = true;
+        ApplyFilter();
+        ApplySort();
+        CalculateSummary();
+    }
+
+    private void ClearVeteranNameFilter()
+    {
+        _searchVeteranName = string.Empty;
+        _veteranNameFilterApplied = false;
+        ApplyFilter();
+        ApplySort();
+        CalculateSummary();
+    }
+
+    private void ApplySoundOffNumberFilter()
+    {
+        _soundOffNumberFilterApplied = true;
+        ApplyFilter();
+        ApplySort();
+        CalculateSummary();
+    }
+
+    private void ClearSoundOffNumberFilter()
+    {
+        _searchSoundOffNumber = string.Empty;
+        _soundOffNumberFilterApplied = false;
+        ApplyFilter();
+        ApplySort();
+        CalculateSummary();
+    }
+
+    // Two-way binding triggers ApplyFiltersAndSort automatically
+    // If you want to debounce, you can add a timer here
+}
