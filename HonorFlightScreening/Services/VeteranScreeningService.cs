@@ -16,12 +16,11 @@ public class VeteranScreeningService
     }
 
     /// <summary>
-    /// Get all screenings for a specific user
+    /// Get all screenings
     /// </summary>
-    public async Task<List<VeteranScreening>> GetUserScreeningsAsync(string userId)
+    public async Task<List<VeteranScreening>> GetAllScreeningsAsync()
     {
         return await _context.VeteranScreenings
-            .Where(s => s.UserId == userId)
             .OrderByDescending(s => s.LastModified)
             .ToListAsync();
     }
@@ -29,10 +28,10 @@ public class VeteranScreeningService
     /// <summary>
     /// Get a specific screening by ID
     /// </summary>
-    public async Task<VeteranScreening?> GetScreeningAsync(int id, string userId)
+    public async Task<VeteranScreening?> GetScreeningAsync(int id)
     {
         return await _context.VeteranScreenings
-            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+            .FirstOrDefaultAsync(s => s.Id == id );
     }
 
     /// <summary>
@@ -72,7 +71,7 @@ public class VeteranScreeningService
     /// </summary>
     public async Task<bool> DeleteScreeningAsync(int id, string userId)
     {
-        var screening = await GetScreeningAsync(id, userId);
+        var screening = await GetScreeningAsync(id);
         if (screening == null)
             return false;
 
@@ -81,19 +80,5 @@ public class VeteranScreeningService
         return true;
     }
 
-    /// <summary>
-    /// Mark screening as completed
-    /// </summary>
-    public async Task<bool> CompleteScreeningAsync(int id, string userId)
-    {
-        var screening = await GetScreeningAsync(id, userId);
-        if (screening == null)
-            return false;
-
-        screening.Status = ScreeningStatus.Completed;
-        screening.LastModified = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
+  
 }
