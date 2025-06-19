@@ -42,7 +42,7 @@ public class VeteranScreeningServiceTests
         using var context = GetInMemoryDbContext();
         var service = new VeteranScreeningService(context);
         var userId = "user123";
-        
+
         await service.CreateScreeningAsync("John Doe", userId);
         await service.CreateScreeningAsync("Jane Smith", userId);
         await service.CreateScreeningAsync("Bob Wilson", "otheruser");
@@ -62,7 +62,7 @@ public class VeteranScreeningServiceTests
         using var context = GetInMemoryDbContext();
         var service = new VeteranScreeningService(context);
         var userId = "user123";
-        
+
         var screening = await service.CreateScreeningAsync("John Doe", userId);
 
         // Act
@@ -96,13 +96,13 @@ public class VeteranScreeningServiceTests
         using var context = GetInMemoryDbContext();
         var service = new VeteranScreeningService(context);
         var userId = "user123";
-        
+
         var screening = await service.CreateScreeningAsync("John Doe", userId);
         var originalLastModified = screening.LastModified;
-        
+
         // Wait a small amount to ensure time difference
         await Task.Delay(10);
-        
+
         screening.HasPcpSignature = true;
 
         // Act
