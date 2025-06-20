@@ -1,17 +1,53 @@
 ﻿@page "/VeteranScreenings"
-@using HonorFlightScreening.Data
-@using HonorFlightScreening.Services
+
+
 @using Microsoft.AspNetCore.Authorization
-@inject VeteranScreeningService ScreeningService
-@inject NavigationManager Navigation
 @rendermode InteractiveServer
 @attribute [Authorize]
 
 <PageTitle>Veteran Screenings</PageTitle>
 
 <div class="container-fluid">
-    <h2 class="mb-4">Veteran Screenings</h2>
-    <div class="table-responsive">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-primary">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Screenings
+                </h1>
+                <button type="button" class="btn btn-primary" @onclick="CreateNewScreening">
+                <i class="fas fa-plus me-2"></i>
+                New Screening
+                </button>
+            </div>
+       </div>
+    </div>
+
+@if (_screenings == null)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (!_screenings.Any())
+{
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No screenings found</h5>
+            <p class="text-muted">Create your first screening to get started.</p>
+            <button type="button" class="btn btn-primary" @onclick="CreateNewScreening">
+                <i class="fas fa-plus me-2"></i>
+                Create First Screening
+            </button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive d-none d-md-block">
         <table class="table table-hover table-bordered">
             <thead>
                 <tr>
@@ -119,6 +155,36 @@
         </table>
     </div>
 
+    <!-- Mobile Cards -->
+    <div class="d-block d-md-none">
+        @if (_filteredScreenings != null)
+        {
+            <div class="swipe-cards-list">
+                @foreach (var screening in _filteredScreenings)
+                {
+                    <div class="swipe-card mb-3" id="swipe-card-@screening.Id"
+                         ontouchstart="swipeStart(event, @screening.Id)" ontouchend="swipeEnd(event, @screening.Id)">
+                        <div class="swipe-card-content">
+                            
+                                    <div><strong>Name:</strong> @screening.VeteranName</div>
+                                    <div><strong>Sound-Off:</strong> @screening.SoundOffNumber</div>
+                                    <div><strong>Medical Alerts:</strong> @(screening.HasMedicalAlerts == true ? "Yes" : "No")</div>
+                                    <div><strong>Mobility Alerts:</strong> @(screening.HasMobilityAlerts == true ? "Yes" : "No")</div>
+                                    <div><strong>Special Alerts:</strong> @(screening.HasSpecialAlerts == true ? "Yes" : "No")</div>
+                                    <div><strong>Assistive Device:</strong> @(screening.AssistiveDeviceType?.ToString() ?? "")</div>
+                                    <div><strong>Lift Required:</strong> @screening.LiftRequired</div>
+                                    <div><strong>Use Oxygen:</strong> @(screening.UseOxygen == true ? "Yes" : "No")</div>
+                                    <div><strong>How Much Oxygen:</strong> @screening.HowMuchOxygen</div>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                }
+            </div> <!-- end .swipe-cards-list -->
+        } <!-- end if (_filteredScreenings != null) -->
+    </div> <!-- end .d-block.d-md-none -->
+
     <div class="mt-4">
         <h5>Summary</h5>
         <ul>
@@ -129,171 +195,26 @@
             <li>Total Special Alerts: @_summarySpecialAlerts</li>
         </ul>
     </div>
+    }
 </div>
 
-@code {
-    private List<VeteranScreening>? _screenings;
-    private List<VeteranScreening>? _filteredScreenings;
-
-    private string? _searchVeteranName;
-    private string? _searchSoundOffNumber;
-    private string _sortColumn = "VeteranName";
-    private Dictionary<string, bool> _sortAscendingByColumn = new()
-    {
-        { "VeteranName", true },
-        { "SoundOffNumber", true },
-        { "HasMedicalAlerts", true },
-        { "HasMobilityAlerts", true },
-        { "HasSpecialAlerts", true },
-        { "AssistiveDeviceType", true },
-        { "LiftRequired", true },
-        { "UseOxygen", true },
-        { "HowMuchOxygen", true }
-    };
-
-    private bool _veteranNameFilterApplied;
-    private bool _soundOffNumberFilterApplied;
-
-    private int _summaryUseOxygen;
-    private int _summaryLiftRequiredYes;
-    private int _summaryMedicalAlerts;
-    private int _summaryMobilityAlerts;
-    private int _summarySpecialAlerts;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _screenings = await ScreeningService.GetAllScreeningsAsync();
-        _filteredScreenings = _screenings.ToList();
-        
-        CalculateSummary();
-    }
-
-    protected override void OnParametersSet()
-    {
-       CalculateSummary();
-    }
-
-    private void ApplyFilter()
-    {
-        if (_screenings == null)
-        {
-            _filteredScreenings = new List<VeteranScreening>();
-            return;
-        }
-        if (string.IsNullOrEmpty(_searchVeteranName) &&
-            string.IsNullOrEmpty(_searchSoundOffNumber))
-        {
-            _filteredScreenings = _screenings.ToList();
-            return;
-        }
-        IEnumerable<VeteranScreening> query = _screenings;
-        if (!string.IsNullOrWhiteSpace(_searchVeteranName))
-            query = query.Where(s => s.VeteranName.Contains(_searchVeteranName, StringComparison.OrdinalIgnoreCase));
-        if (!string.IsNullOrWhiteSpace(_searchSoundOffNumber))
-            query = query.Where(s => s.SoundOffNumber.Contains(_searchSoundOffNumber, StringComparison.OrdinalIgnoreCase));
-        _filteredScreenings = query.ToList();
-        
-    }
-
-    private void ApplySort()
-    {
-        if (_filteredScreenings == null)
-        {
-            return;
-        }
-        var ascending = !_sortAscendingByColumn.TryGetValue(_sortColumn, out var asc) || asc;
-        _filteredScreenings = _sortColumn switch
-        {
-            "VeteranName" => ascending ? _filteredScreenings.OrderBy(s => s.VeteranName).ToList() : _filteredScreenings.OrderByDescending(s => s.VeteranName).ToList(),
-            "SoundOffNumber" => ascending ? _filteredScreenings.OrderBy(s => s.SoundOffNumber).ToList() : _filteredScreenings.OrderByDescending(s => s.SoundOffNumber).ToList(),
-            "HasMedicalAlerts" => ascending ? _filteredScreenings.OrderBy(s => s.HasMedicalAlerts).ToList() : _filteredScreenings.OrderByDescending(s => s.HasMedicalAlerts).ToList(),
-            "HasMobilityAlerts" => ascending ? _filteredScreenings.OrderBy(s => s.HasMobilityAlerts).ToList() : _filteredScreenings.OrderByDescending(s => s.HasMobilityAlerts).ToList(),
-            "HasSpecialAlerts" => ascending ? _filteredScreenings.OrderBy(s => s.HasSpecialAlerts).ToList() : _filteredScreenings.OrderByDescending(s => s.HasSpecialAlerts).ToList(),
-            "AssistiveDeviceType" => ascending ? _filteredScreenings.OrderBy(s => s.AssistiveDeviceType).ToList() : _filteredScreenings.OrderByDescending(s => s.AssistiveDeviceType).ToList(),
-            "LiftRequired" => ascending ? _filteredScreenings.OrderBy(s => s.LiftRequired).ToList() : _filteredScreenings.OrderByDescending(s => s.LiftRequired).ToList(),
-            "UseOxygen" => ascending ? _filteredScreenings.OrderBy(s => s.UseOxygen).ToList() : _filteredScreenings.OrderByDescending(s => s.UseOxygen).ToList(),
-            "HowMuchOxygen" => ascending ? _filteredScreenings.OrderBy(s => s.HowMuchOxygen).ToList() : _filteredScreenings.OrderByDescending(s => s.HowMuchOxygen).ToList(),
-            _ => _filteredScreenings
-        };
-    }
-
-    
-    private void CalculateSummary()
-    {
-        if (_filteredScreenings == null)
-        {
-            _summaryUseOxygen = _summaryLiftRequiredYes = _summaryMedicalAlerts = _summaryMobilityAlerts = _summarySpecialAlerts = 0;
-            return;
-        }
-        _summaryUseOxygen = _filteredScreenings.Count(s => s.UseOxygen == true);
-        _summaryLiftRequiredYes = _filteredScreenings.Count(s => string.Equals(s.LiftRequired, "Yes", StringComparison.OrdinalIgnoreCase));
-        _summaryMedicalAlerts = _filteredScreenings.Count(s => s.HasMedicalAlerts == true);
-        _summaryMobilityAlerts = _filteredScreenings.Count(s => s.HasMobilityAlerts == true);
-        _summarySpecialAlerts = _filteredScreenings.Count(s => s.HasSpecialAlerts == true);
-    }
-
-    private void NavigateToScreening(int id)
-    {
-        Navigation.NavigateTo($"/screening/{id}");
-    }
-
-    private string GetSortIcon(string column)
-    {
-        var ascending = !_sortAscendingByColumn.TryGetValue(column, out var asc) || asc;
-        var icon = ascending ? " ▲" : " ▼";
-        return _sortColumn == column ? $"<span style='font-weight:bold'>{icon}</span>" : $"<span class='text-muted'>{icon}</span>";
-    }
-
-    private void OnSort(string column)
-    {
-        if (_sortColumn == column)
-        {
-            _sortAscendingByColumn[column] = !_sortAscendingByColumn[column];
-        }
-        else
-        {
-            _sortColumn = column;
-            if (!_sortAscendingByColumn.ContainsKey(column))
-                _sortAscendingByColumn[column] = true;
-        }
-        ApplySort();
-    }
-
-    
-    private void ApplyVeteranNameFilter()
-    {
-        _veteranNameFilterApplied = true;
-        ApplyFilter();
-        ApplySort();
-        CalculateSummary();
-    }
-
-    private void ClearVeteranNameFilter()
-    {
-        _searchVeteranName = string.Empty;
-        _veteranNameFilterApplied = false;
-        ApplyFilter();
-        ApplySort();
-        CalculateSummary();
-    }
-
-    private void ApplySoundOffNumberFilter()
-    {
-        _soundOffNumberFilterApplied = true;
-        ApplyFilter();
-        ApplySort();
-        CalculateSummary();
-    }
-
-    private void ClearSoundOffNumberFilter()
-    {
-        _searchSoundOffNumber = string.Empty;
-        _soundOffNumberFilterApplied = false;
-        ApplyFilter();
-        ApplySort();
-        CalculateSummary();
-    }
-
-    // Two-way binding triggers ApplyFiltersAndSort automatically
-    // If you want to debounce, you can add a timer here
+<script>
+window.swipeStartX = {};
+window.swipeStart = function (e, id) {
+    window.swipeStartX[id] = e.changedTouches[0].screenX;
 }
+window.swipeEnd = function (e, id) {
+    var startX = window.swipeStartX[id];
+    var endX = e.changedTouches[0].screenX;
+    var diff = endX - startX;
+    if (Math.abs(diff) > 40) {
+        if (diff < 0) {
+            DotNet.invokeMethodAsync('HonorFlightScreening', 'OnSwipeLeft', id);
+        } else {
+            DotNet.invokeMethodAsync('HonorFlightScreening', 'OnSwipeRight', id);
+        }
+    }
+}
+</script>
+
+
