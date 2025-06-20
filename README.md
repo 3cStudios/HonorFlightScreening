@@ -23,8 +23,6 @@ A mobile-first web application for conducting medical and mobility screenings of
 - Expandable sections for detailed information
 - Device selection (cane, walker, wheelchair, scooter)
 - 500-character notes field with live counter
-- Progress indicator
-- Patriotic design elements
 
 ## Getting Started
 
@@ -94,25 +92,6 @@ python -m http.server 8000  # For local development server
 - Edge 79+
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
-### File Structure
-```
-honor-flight-screening/
-├── index.html              # Main application file
-├── README.md              # This file
-├── assets/               # Optional assets directory
-│   ├── images/           # Screenshots, logos
-│   └── docs/            # Additional documentation
-└── examples/            # Example forms or test data
-```
-
-## 📸 Screenshots
-
-![Honor Flight Screening Form](assets/images/form-overview.png)
-*Main form interface showing medical screening section*
-
-![Mobile View](assets/images/mobile-view.png)
-*Mobile-optimized view on smartphone*
-
 ### Development Setup
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/new-feature`
@@ -140,21 +119,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### For Technical Issues
 - Create an issue in this repository
-- Email: tech-support@honorflight.org
-- Documentation: [Wiki](https://github.com/3cstudios/honor-flight-screening/wiki)
+- Email: support@3cstudios.com
 
-### For Honor Flight Program Questions
-- Visit: [Honor Flight Network](https://www.honorflight.org)
-- Contact your local Honor Flight hub
-
-## Acknowledgments
-
-- Honor Flight Network for their service to veterans
-- The veteran community for their feedback and input
-- Contributors and maintainers of this project
-- Open source community for tools and inspiration
-
----
 
 **Made with ❤️ for our veterans**
 
