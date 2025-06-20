@@ -109,7 +109,7 @@
     display: block;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 1025px) {
     .navbar-toggler {
         display: none;
     }

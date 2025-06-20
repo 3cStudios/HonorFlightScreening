@@ -163,20 +163,74 @@ else
                 @foreach (var screening in _filteredScreenings)
                 {
                     <div class="swipe-card mb-3" id="swipe-card-@screening.Id"
-                         ontouchstart="swipeStart(event, @screening.Id)" ontouchend="swipeEnd(event, @screening.Id)">
+                         @onclick="() => NavigateToScreening(screening.Id)">
                         <div class="swipe-card-content">
-                            
-                                    <div><strong>Name:</strong> @screening.VeteranName</div>
-                                    <div><strong>Sound-Off:</strong> @screening.SoundOffNumber</div>
-                                    <div><strong>Medical Alerts:</strong> @(screening.HasMedicalAlerts == true ? "Yes" : "No")</div>
-                                    <div><strong>Mobility Alerts:</strong> @(screening.HasMobilityAlerts == true ? "Yes" : "No")</div>
-                                    <div><strong>Special Alerts:</strong> @(screening.HasSpecialAlerts == true ? "Yes" : "No")</div>
-                                    <div><strong>Assistive Device:</strong> @(screening.AssistiveDeviceType?.ToString() ?? "")</div>
-                                    <div><strong>Lift Required:</strong> @screening.LiftRequired</div>
-                                    <div><strong>Use Oxygen:</strong> @(screening.UseOxygen == true ? "Yes" : "No")</div>
-                                    <div><strong>How Much Oxygen:</strong> @screening.HowMuchOxygen</div>
-                            
-                            
+                            <div><strong>Name:</strong> @screening.VeteranName</div>
+                            <div><strong>Sound-Off:</strong> @screening.SoundOffNumber</div>
+                            <div><strong>Medical Alerts:</strong> 
+                                    @{
+                                        if (screening.HasMedicalAlerts == true)
+                                        {
+                                            <span class="badge bg-warning">Yes</span>
+                                            
+                                        }
+                                        else
+                                        {
+                                            <span>No</span>
+                                        }
+                                                                    
+                                    }
+                            </div>
+                            <div><strong>Mobility Alerts:</strong>
+                                 @{
+                                        if (screening.HasMobilityAlerts == true)
+                                        {
+                                            <span class="badge bg-warning">Yes</span>
+                                            
+                                        }
+                                        else
+                                        {
+                                            <span>No</span>
+                                        }
+                                                                    
+                                    }
+                                </div>
+                                
+                                
+                            <div><strong>Special Alerts:</strong>
+                                @{
+                                    if (screening.HasSpecialAlerts == true)
+                                    {
+                                        <span class="badge bg-warning">Yes</span>
+                                            
+                                    }
+                                    else
+                                    {
+                                        <span>No</span>
+                                    }
+                                                                    
+                                }
+                                
+                                </div>
+                            <div><strong>Assistive Device:</strong> @(screening.AssistiveDeviceType?.ToString() ?? "")</div>
+                            <div><strong>Lift Required:</strong> @screening.LiftRequired</div>
+                            <div><strong>Use Oxygen:</strong>
+                                @{
+                                    if (screening.UseOxygen == true)
+                                    {
+                                        <span class="badge bg-warning">Yes</span>
+                                            
+                                    }
+                                    else
+                                    {
+                                        <span>No</span>
+                                    }
+                                                                    
+                                }
+                                
+                                </div>
+                            <div><strong>How Much Oxygen:</strong> @screening.HowMuchOxygen</div>
+                           
                         </div>
                         
                     </div>
@@ -189,32 +243,14 @@ else
         <h5>Summary</h5>
         <ul>
             <li>Total Use Oxygen: @_summaryUseOxygen</li>
-            <li>Total Lift Required (Yes): @_summaryLiftRequiredYes</li>
+            <li>Total Lift Required: @_summaryLiftRequiredYes</li>
+            <li>Total Lift Required: @_summaryLiftRequiredYes</li>
             <li>Total Medical Alerts: @_summaryMedicalAlerts</li>
             <li>Total Mobility Alerts: @_summaryMobilityAlerts</li>
             <li>Total Special Alerts: @_summarySpecialAlerts</li>
+            <li>Total Signature Needed: @_summaryPCPSignature</li>
         </ul>
     </div>
     }
 </div>
-
-<script>
-window.swipeStartX = {};
-window.swipeStart = function (e, id) {
-    window.swipeStartX[id] = e.changedTouches[0].screenX;
-}
-window.swipeEnd = function (e, id) {
-    var startX = window.swipeStartX[id];
-    var endX = e.changedTouches[0].screenX;
-    var diff = endX - startX;
-    if (Math.abs(diff) > 40) {
-        if (diff < 0) {
-            DotNet.invokeMethodAsync('HonorFlightScreening', 'OnSwipeLeft', id);
-        } else {
-            DotNet.invokeMethodAsync('HonorFlightScreening', 'OnSwipeRight', id);
-        }
-    }
-}
-</script>
-
 

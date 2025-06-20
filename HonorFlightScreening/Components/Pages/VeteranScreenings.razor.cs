@@ -39,7 +39,7 @@ namespace HonorFlightScreening.Components.Pages
         private int _summaryMedicalAlerts;
         private int _summaryMobilityAlerts;
         private int _summarySpecialAlerts;
-
+        private int _summaryPCPSignature;
         protected override async Task OnInitializedAsync()
         {
             _screenings = await ScreeningService.GetAllScreeningsAsync();
@@ -102,7 +102,7 @@ namespace HonorFlightScreening.Components.Pages
 
         private void NavigateToScreening(int id)
         {
-            Navigation.NavigateTo($"/ScreeningDetails/{id}");
+            Navigation.NavigateTo($"/screening/{id}");
         }
 
         private void CreateNewScreening()
@@ -164,6 +164,7 @@ namespace HonorFlightScreening.Components.Pages
             _summaryMedicalAlerts = _filteredScreenings.Count(s => s.HasMedicalAlerts == true);
             _summaryMobilityAlerts = _filteredScreenings.Count(s => s.HasMobilityAlerts == true);
             _summarySpecialAlerts = _filteredScreenings.Count(s => s.HasSpecialAlerts == true);
+            _summaryPCPSignature = _filteredScreenings.Count(s => s.HasPcpSignature == false);
         }
 
     }
