@@ -36,15 +36,13 @@ A mobile-first web application for conducting medical and mobility screenings of
 git clone https://github.com/your-org/honor-flight-screening.git
 cd honor-flight-screening
 ```
-
-2. Open the form:
-```bash
-# Simply open the HTML file in your browser
-open index.html
-# or
-python -m http.server 8000  # For local development server
+2. Create the SQL Server database
+3. Add your connection string to the solution
+   - The solution uses Azure configuration but with minor changes you can use appsettings.config
+5. Run the migrations in the solution
 ```
-
+dotnet ef database update
+``` 
 
 #### Medical Assessment
 - **Oxygen Use** - Includes amount specification
