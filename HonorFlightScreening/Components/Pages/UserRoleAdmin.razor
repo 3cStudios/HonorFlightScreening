@@ -5,11 +5,12 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole> RoleManager
+@rendermode InteractiveServer
 
 <PageTitle>User Role Administration</PageTitle>
 
-@* <AuthorizeView Roles="admin">
-    <Authorized> *@
+<AuthorizeView Roles="admin">
+    <Authorized>
         <h3>User Role Administration</h3>
 
         @if (_users == null || _roles == null)
@@ -53,11 +54,11 @@
                 <div class="alert alert-info">@_statusMessage</div>
             }
         }
-@*     </Authorized>
+    </Authorized>
     <NotAuthorized>
         <div class="alert alert-danger mt-3">You are not authorized to view this page.</div>
     </NotAuthorized>
-</AuthorizeView> *@
+</AuthorizeView>
 
 @code {
     private List<ApplicationUser>? _users;
@@ -99,3 +100,5 @@
         }
     }
 }
+
+

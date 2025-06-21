@@ -1,0 +1,305 @@
+@page "/admin/users"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using HonorFlightScreening.Data
+@using Microsoft.AspNetCore.Authorization
+
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "admin")]
+
+<PageTitle>User Management</PageTitle>
+
+<h3>User Management</h3>
+
+@if (_isLoading)
+{
+    <p>Loading users...</p>
+}
+else
+{
+    <button class="btn btn-success mb-2" @onclick="ShowAddUser">Add User</button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>User Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in _users)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.UserName</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-1" @onclick="() => EditUser(user)">Edit</button>
+                        <button class="btn btn-sm btn-warning me-1" @onclick="() => ShowChangePassword(user)">Change Password</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDeleteUser(user)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showForm)
+{
+    <EditForm Model="_editModel" OnValidSubmit="OnValidSubmitUser" class="mb-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <label>Email</label>
+            <InputText @bind-Value="_editModel.Email" class="form-control" />
+        </div>
+        
+        @if (_isNewUser)
+        {
+            <div class="mb-2">
+                <label>Password</label>
+                <InputText @bind-Value="_editModel.Password" type="password" class="form-control" />
+            </div>
+        }
+        <button class="btn btn-primary me-2" type="submit">@((_isNewUser ? "Add" : "Update"))</button>
+        <button class="btn btn-secondary" type="button" @onclick="CancelEdit">Cancel</button>
+    </EditForm>
+}
+
+@if (_showChangePasswordForm)
+{
+    <EditForm Model="_changePasswordModel" OnValidSubmit="OnValidSubmitChangePassword" class="mb-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <label>New Password</label>
+            <InputText @bind-Value="_changePasswordModel.NewPassword" type="password" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>Confirm Password</label>
+            <InputText @bind-Value="_changePasswordModel.ConfirmPassword" type="password" class="form-control" />
+        </div>
+        <button class="btn btn-primary me-2" type="submit">Change Password</button>
+        <button class="btn btn-secondary" type="button" @onclick="CancelChangePassword">Cancel</button>
+    </EditForm>
+}
+
+@if (_showDeleteConfirm)
+{
+    <div class="alert alert-warning">
+        <strong>Are you sure you want to delete user '@_deleteUser?.Email'?</strong>
+        <br />
+        <button class="btn btn-danger me-2" @onclick="DeleteUserConfirmed">Delete</button>
+        <button class="btn btn-secondary" @onclick="() => _showDeleteConfirm = false">Cancel</button>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(_statusMessage))
+{
+    <div class="alert alert-info">@_statusMessage</div>
+}
+
+@code {
+    private List<ApplicationUser> _users = new();
+    private bool _isLoading = true;
+    private bool _showForm;
+    private bool _isNewUser;
+    private string? _statusMessage;
+    private EditUserModel _editModel = new();
+    private ApplicationUser? _editingUser;
+    private bool _showDeleteConfirm;
+    private ApplicationUser? _deleteUser;
+    private bool _showChangePasswordForm;
+    private ChangePasswordModel _changePasswordModel = new();
+    private ApplicationUser? _changePasswordUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        _isLoading = true;
+        _users = UserManager.Users.ToList();
+        _isLoading = false;
+    }
+
+    private void ShowAddUser()
+    {
+        _editModel = new EditUserModel();
+        _editingUser = null;
+        _isNewUser = true;
+        _showForm = true;
+        _statusMessage = null;
+    }
+
+    private void EditUser(ApplicationUser user)
+    {
+        _editModel = new EditUserModel
+        {
+            Email = user.Email ?? string.Empty,
+            UserName = user.UserName ?? string.Empty
+        };
+        _editingUser = user;
+        _isNewUser = false;
+        _showForm = true;
+        _statusMessage = null;
+    }
+
+    private void CancelEdit()
+    {
+        _showForm = false;
+        _editingUser = null;
+        _statusMessage = null;
+    }
+
+    private async Task OnValidSubmitUser()
+    {
+        if (_isNewUser)
+        {
+           
+            var user = new ApplicationUser { Email = _editModel.Email, UserName = _editModel.Email, EmailConfirmed = true };
+            var result = await UserManager.CreateAsync(user, _editModel.Password);
+            if (result.Succeeded)
+            {
+                _statusMessage = $"User '{_editModel.Email}' added.";
+                await LoadUsers();
+                _showForm = false;
+            }
+            else
+            {
+                _statusMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+            }
+        }
+        else if (_editingUser != null)
+        {
+            _editingUser.Email = _editModel.Email;
+            _editingUser.UserName = _editModel.UserName;
+            var result = await UserManager.UpdateAsync(_editingUser);
+            if (result.Succeeded)
+            {
+                _statusMessage = $"User '{_editModel.Email}' updated.";
+                await LoadUsers();
+                _showForm = false;
+            }
+            else
+            {
+                _statusMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+            }
+        }
+    }
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                                                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
+    private void ShowChangePassword(ApplicationUser user)
+    {
+        _changePasswordUser = user;
+        _changePasswordModel = new ChangePasswordModel();
+        _showChangePasswordForm = true;
+        _statusMessage = null;
+    }
+
+    private void CancelChangePassword()
+    {
+        _showChangePasswordForm = false;
+        _changePasswordUser = null;
+        _statusMessage = null;
+    }
+
+    private async Task OnValidSubmitChangePassword()
+    {
+        if (_changePasswordUser == null)
+            return;
+        if (_changePasswordModel.NewPassword != _changePasswordModel.ConfirmPassword)
+        {
+            _statusMessage = "Passwords do not match.";
+            return;
+        }
+        var token = await UserManager.GeneratePasswordResetTokenAsync(_changePasswordUser);
+        var result = await UserManager.ResetPasswordAsync(_changePasswordUser, token, _changePasswordModel.NewPassword);
+        if (result.Succeeded)
+        {
+            _statusMessage = $"Password for '{_changePasswordUser.Email}' changed.";
+            _showChangePasswordForm = false;
+            _changePasswordUser = null;
+        }
+        else
+        {
+            _statusMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+        }
+    }
+
+    private void ConfirmDeleteUser(ApplicationUser user)
+    {
+        _deleteUser = user;
+        _showDeleteConfirm = true;
+        _statusMessage = null;
+    }
+
+    private async Task DeleteUserConfirmed()
+    {
+        if (_deleteUser != null)
+        {
+            var result = await UserManager.DeleteAsync(_deleteUser);
+            if (result.Succeeded)
+            {
+                _statusMessage = $"User '{_deleteUser.Email}' deleted.";
+                await LoadUsers();
+            }
+            else
+            {
+                _statusMessage = string.Join("; ", result.Errors.Select(e => e.Description));
+            }
+        }
+        _showDeleteConfirm = false;
+        _deleteUser = null;
+    }
+
+    private class EditUserModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Password is required for new users.")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private class ChangePasswordModel
+    {
+        [Required]
+        [StringLength(100, ErrorMessage = "The password must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}
