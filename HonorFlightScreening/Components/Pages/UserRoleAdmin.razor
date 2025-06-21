@@ -1,0 +1,101 @@
+@page "/admin/userroles"
+
+@using Microsoft.AspNetCore.Identity
+@using HonorFlightScreening.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+
+<PageTitle>User Role Administration</PageTitle>
+
+@* <AuthorizeView Roles="admin">
+    <Authorized> *@
+        <h3>User Role Administration</h3>
+
+        @if (_users == null || _roles == null)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>User Name</th>
+                        <th>Roles</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in _users)
+                    {
+                        <tr>
+                            <td>@user.Email</td>
+                            <td>@user.UserName</td>
+                            <td>@(GetUserRoles(user))</td>
+                            <td>
+                                @if (!IsUserAdmin(user))
+                                {
+                                    <button class="btn btn-sm btn-primary" @onclick="() => AssignAdminRole(user)">Make Admin</button>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Admin</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!string.IsNullOrEmpty(_statusMessage))
+            {
+                <div class="alert alert-info">@_statusMessage</div>
+            }
+        }
+@*     </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-danger mt-3">You are not authorized to view this page.</div>
+    </NotAuthorized>
+</AuthorizeView> *@
+
+@code {
+    private List<ApplicationUser>? _users;
+    private List<IdentityRole>? _roles;
+    private readonly Dictionary<string, IList<string>> _userRoles = new();
+    private string? _statusMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = UserManager.Users.ToList();
+        _roles = RoleManager.Roles.ToList();
+        foreach (var user in _users)
+        {
+            _userRoles[user.Id] = await UserManager.GetRolesAsync(user);
+        }
+    }
+
+    private string GetUserRoles(ApplicationUser user)
+        => _userRoles.TryGetValue(user.Id, out var roles) ? string.Join(", ", roles) : string.Empty;
+
+    private bool IsUserAdmin(ApplicationUser user)
+        => _userRoles.TryGetValue(user.Id, out var roles) && roles.Contains("admin");
+
+    private async Task AssignAdminRole(ApplicationUser user)
+    {
+        if (!IsUserAdmin(user))
+        {
+            var result = await UserManager.AddToRoleAsync(user, "admin");
+            if (result.Succeeded)
+            {
+                _userRoles[user.Id].Add("admin");
+                _statusMessage = $"{user.Email} is now an admin.";
+            }
+            else
+            {
+                _statusMessage = $"Failed to assign admin role: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+            }
+            StateHasChanged();
+        }
+    }
+}
