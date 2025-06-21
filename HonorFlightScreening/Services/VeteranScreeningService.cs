@@ -25,6 +25,15 @@ public class VeteranScreeningService
             .ToListAsync();
     }
 
+    public async Task<List<VeteranScreening>> GetAllScreeningsByHonorFlightIdAsync(int honorFlightId)
+    {
+        return await _context.VeteranScreenings
+            .Where(s => s.HonorFlightId == honorFlightId)
+            .OrderByDescending(s => s.LastModified)
+            .ToListAsync();
+    }
+
+
     /// <summary>
     /// Get a specific screening by ID
     /// </summary>

@@ -8,6 +8,7 @@ namespace HonorFlightScreening.Data;
 /// </summary>
 public class VeteranScreening
 {
+    [Key]
     public int Id { get; set; }
     
     [Required]
@@ -21,7 +22,6 @@ public class VeteranScreening
     public string GuardianPhone { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(50)]
     public int SoundOffNumber { get; set; }
 
     public string UserId { get; set; } = string.Empty;
@@ -64,8 +64,10 @@ public class VeteranScreening
 
     [StringLength(500)]
     public string Notes { get; set; } = string.Empty;
-    
-        
+    public int HonorFlightId { get; set; }
+    public HonorFlight HonorFlight { get; set; } = default!;
+
+
 }
 
 /// <summary>

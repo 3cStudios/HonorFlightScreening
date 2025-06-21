@@ -13,6 +13,8 @@ namespace HonorFlightScreening.Components.Pages
         [Inject] private NavigationManager Navigation { get; set; } = default!;
         [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
+        [CascadingParameter] public required HonorFlightSession HonorFlightSession { get; set; }
+
         [Parameter] public int? Id { get; set; }
 
         private VeteranScreening _screening = new();
@@ -40,6 +42,7 @@ namespace HonorFlightScreening.Components.Pages
                     Navigation.NavigateTo("/FlightSummary");
                 }
             }
+           
         }
 
         private async Task SaveScreening()
@@ -47,6 +50,10 @@ namespace HonorFlightScreening.Components.Pages
             if (string.IsNullOrEmpty(_currentUserId))
                 return;
 
+            if (_screening.HonorFlightId == 0 && HonorFlightSession?.SelectedHonorFlightId != null)
+            {
+                _screening.HonorFlightId = HonorFlightSession.SelectedHonorFlightId.Value;
+            }
             if (IsNewScreening)
             {
                 _screening = await ScreeningService.CreateScreeningAsync(_screening);
@@ -59,7 +66,21 @@ namespace HonorFlightScreening.Components.Pages
             Navigation.NavigateTo("/FlightSummary");
         }
 
+        private async Task DeleteScreening()
+        {
+            if (IsNewScreening || _screening.Id == 0)
+                return;
 
+            bool confirmed = await JsRuntime.InvokeAsync<bool>(
+                "confirm",
+                "Are you sure you want to delete this screening? This action cannot be undone."
+            );
+            if (!confirmed)
+                return;
+
+            await ScreeningService.DeleteScreeningAsync(_screening.Id, _currentUserId ?? string.Empty);
+            Navigation.NavigateTo("/FlightSummary");
+        }
 
         private void GoBack()
         {

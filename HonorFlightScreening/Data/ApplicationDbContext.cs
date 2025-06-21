@@ -6,12 +6,19 @@ namespace HonorFlightScreening.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
         public DbSet<VeteranScreening> VeteranScreenings { get; set; }
+        public DbSet<HonorFlight> HonorFlight { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); // Important: keep this line
 
             // Configure VeteranScreening
+            modelBuilder.Entity<VeteranScreening>()
+                .HasOne(vs => vs.HonorFlight)
+                .WithMany(hf => hf.VeteranScreenings)
+                .HasForeignKey(vs => vs.HonorFlightId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<VeteranScreening>(entity =>
             {
                 entity.Property(e => e.UserId)
@@ -26,6 +33,8 @@ namespace HonorFlightScreening.Data
                     .HasColumnType("datetime2")
                     .IsRequired(false);
             });
+
+
         }
     }
 }
