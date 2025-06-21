@@ -2,9 +2,11 @@
 
 @using Microsoft.AspNetCore.Identity
 @using HonorFlightScreening.Data
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole> RoleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
 <PageTitle>User Role Administration</PageTitle>
@@ -43,6 +45,10 @@
                                 else
                                 {
                                     <span class="badge bg-success">Admin</span>
+                                    @if (!IsCurrentUser(user))
+                                    {
+                                        <button class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveAdminRole(user)">Remove Admin</button>
+                                    }
                                 }
                             </td>
                         </tr>
@@ -65,6 +71,7 @@
     private List<IdentityRole>? _roles;
     private readonly Dictionary<string, IList<string>> _userRoles = new();
     private string? _statusMessage;
+    private string? _currentUserId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,6 +80,12 @@
         foreach (var user in _users)
         {
             _userRoles[user.Id] = await UserManager.GetRolesAsync(user);
+        }
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdentity = authState.User;
+        if (userIdentity.Identity?.IsAuthenticated == true)
+        {
+            _currentUserId = UserManager.GetUserId(userIdentity);
         }
     }
 
@@ -98,6 +111,29 @@
             }
             StateHasChanged();
         }
+    }
+
+    private async Task RemoveAdminRole(ApplicationUser user)
+    {
+        if (IsUserAdmin(user))
+        {
+            var result = await UserManager.RemoveFromRoleAsync(user, "admin");
+            if (result.Succeeded)
+            {
+                _userRoles[user.Id].Remove("admin");
+                _statusMessage = $"{user.Email} is no longer an admin.";
+            }
+            else
+            {
+                _statusMessage = $"Failed to remove admin role: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+            }
+            StateHasChanged();
+        }
+    }
+
+    private bool IsCurrentUser(ApplicationUser user)
+    {
+        return _currentUserId != null && user.Id == _currentUserId;
     }
 }
 
