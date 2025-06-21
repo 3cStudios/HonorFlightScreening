@@ -1,35 +1,38 @@
 ﻿using HonorFlightScreening.Data;
 using HonorFlightScreening.Services;
 using Microsoft.AspNetCore.Components;
-
+using Microsoft.JSInterop;
 
 namespace HonorFlightScreening.Components.Pages
 {
     public partial class FlightSummary : ComponentBase
     {
         [Inject] private VeteranScreeningService ScreeningService { get; set; } = default!;
+        [Inject] private HonorFlightService HonorFlightService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
-
+        [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
+        [CascadingParameter] public required HonorFlightSession HonorFlightSession { get; set; }
 
         private List<VeteranScreening>? _screenings;
         private List<VeteranScreening>? _filteredScreenings;
+        private List<HonorFlight>? _honorFlights;
+        private int? _selectedHonorFlightId;
 
         private string? _searchVeteranName;
         private int? _searchSoundOffNumber;
 
-
         private readonly Dictionary<string, bool> _sortAscendingByColumn = new()
-    {
-        { "VeteranName", true },
-        { "SoundOffNumber", true },
-        { "HasMedicalAlerts", true },
-        { "HasMobilityAlerts", true },
-        { "HasSpecialAlerts", true },
-        { "AssistiveDeviceType", true },
-        { "LiftRequired", true },
-        { "UseOxygen", true },
-        { "HowMuchOxygen", true }
-    };
+        {
+            { "VeteranName", true },
+            { "SoundOffNumber", true },
+            { "HasMedicalAlerts", true },
+            { "HasMobilityAlerts", true },
+            { "HasSpecialAlerts", true },
+            { "AssistiveDeviceType", true },
+            { "LiftRequired", true },
+            { "UseOxygen", true },
+            { "HowMuchOxygen", true }
+        };
 
         private bool _veteranNameFilterApplied;
         private bool _soundOffNumberFilterApplied;
@@ -40,17 +43,91 @@ namespace HonorFlightScreening.Components.Pages
         private int _summaryMobilityAlerts;
         private int _summarySpecialAlerts;
         private int _summaryPCPSignature;
+
+        private bool _showAddFlightDatePicker = false;
+        private DateTime _newHonorFlightDate = DateTime.Today;
+        
+
         protected override async Task OnInitializedAsync()
         {
-            _screenings = await ScreeningService.GetAllScreeningsAsync();
-            _filteredScreenings = _screenings.ToList();
-
+            
+            _honorFlights = await HonorFlightService.GetAllHonorFlightsAsync();
+            if (_honorFlights.Count > 0)
+            {
+                _selectedHonorFlightId = HonorFlightSession.SelectedHonorFlightId ?? _honorFlights.First().Id;
+                
+            }
+            await LoadScreeningsForSelectedFlight();
             CalculateSummary();
         }
+              
 
-        protected override void OnParametersSet()
+        private async Task LoadScreeningsForSelectedFlight()
         {
-            CalculateSummary();
+            if (_selectedHonorFlightId.HasValue)
+            {
+                _screenings = await ScreeningService.GetAllScreeningsByHonorFlightIdAsync(_selectedHonorFlightId.Value);
+                _filteredScreenings = _screenings.ToList();
+            }
+            else
+            {
+                _screenings = new List<VeteranScreening>();
+                _filteredScreenings = new List<VeteranScreening>();
+            }
+        }
+
+        private async Task OnHonorFlightSelected(ChangeEventArgs e)
+        {
+            if (int.TryParse(e.Value?.ToString(), out var id))
+            {
+                _selectedHonorFlightId = id;
+                HonorFlightSession.SelectedHonorFlightId = id;
+                await LoadScreeningsForSelectedFlight();
+                CalculateSummary();
+                StateHasChanged();
+            }
+        }
+
+        private async Task DeleteHonorFlight()
+        {
+            if (_selectedHonorFlightId.HasValue)
+            {
+                bool confirmed = await JsRuntime.InvokeAsync<bool>(
+                    "confirm",
+                    "Are you sure you want to delete this Honor Flight and ALL associated screenings? This action cannot be undone."
+                );
+                if (!confirmed)
+                    return;
+                await HonorFlightService.DeleteHonorFlightAsync(_selectedHonorFlightId.Value);
+                _honorFlights = await HonorFlightService.GetAllHonorFlightsAsync();
+                _selectedHonorFlightId = _honorFlights.FirstOrDefault()?.Id;
+                HonorFlightSession.SelectedHonorFlightId = _selectedHonorFlightId;
+                await LoadScreeningsForSelectedFlight();
+                StateHasChanged();
+            }
+        }
+
+        private void ShowAddHonorFlightDatePicker()
+        {
+            _newHonorFlightDate = DateTime.Today;
+            _showAddFlightDatePicker = true;
+        }
+
+        private async Task ConfirmAddHonorFlight()
+        {
+            var newFlight = new HonorFlight { FlightDate = _newHonorFlightDate };
+            var created = await HonorFlightService.CreateHonorFlightAsync(newFlight);
+            _honorFlights = await HonorFlightService.GetAllHonorFlightsAsync();
+            _selectedHonorFlightId = created.Id;
+            HonorFlightSession.SelectedHonorFlightId = created.Id;
+            await LoadScreeningsForSelectedFlight();
+            _showAddFlightDatePicker = false;
+            StateHasChanged();
+        }
+
+        private void CancelAddHonorFlight()
+        {
+            _showAddFlightDatePicker = false;
         }
 
         private void ApplyVeteranNameFilter()
@@ -102,14 +179,24 @@ namespace HonorFlightScreening.Components.Pages
 
         private void NavigateToScreening(int id)
         {
+
             Navigation.NavigateTo($"/screening/{id}");
         }
 
         private void CreateNewScreening()
         {
+            if (_selectedHonorFlightId.HasValue)
+            {
+                HonorFlightSession ??= new HonorFlightSession();
+                HonorFlightSession.SelectedHonorFlightId = _selectedHonorFlightId.Value;
+            }
+            else
+            {
+                return; // No Honor Flight selected, cannot create a new screening
+            }
             Navigation.NavigateTo("/screening/new");
-
         }
+
         private void OnSort(string column)
         {
             if (_sortColumn == column)
@@ -155,6 +242,7 @@ namespace HonorFlightScreening.Components.Pages
                 _ => _filteredScreenings
             };
         }
+
         private void CalculateSummary()
         {
             if (_filteredScreenings == null)
@@ -169,6 +257,5 @@ namespace HonorFlightScreening.Components.Pages
             _summarySpecialAlerts = _filteredScreenings.Count(s => s.HasSpecialAlerts == true);
             _summaryPCPSignature = _filteredScreenings.Count(s => s.HasPcpSignature == false);
         }
-
     }
 }

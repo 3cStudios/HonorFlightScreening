@@ -59,8 +59,8 @@
                                 </div>
                                 <div class=" mb-3">
                                     <label for="SoundOffNumber" class="form-label">Sound-Off Number *</label>
-                                    <InputSelect id="SoundOffNumber" class="form-control" @bind-Value="_screening.SoundOffNumber">
-                                        <option value="">Select...</option>
+                                    <InputSelect int id="SoundOffNumber" class="form-control" @bind-Value="_screening.SoundOffNumber">
+                                        <option value="0">Select...</option>
                                         @for (var i = 1; i <= 50; i++)
                                         {
                                             <option value="@i">@i</option>
@@ -378,14 +378,11 @@
                                 <div class="question-group">
                                     @{
                                         if (_screening.UseInsulin is true
-                                        && _screening.HelpWithInsulin is true)
+                                        && _screening.HelpWithInsulin is true && _screening.HasSpecialAlerts == false)
                                         {
                                             _screening.HasSpecialAlerts = true;
                                         }
-                                        else
-                                        {
-                                            _screening.HasSpecialAlerts = false;
-                                        }
+                                        
                                     }
                                     <label class="question-label">Are there any special alerts?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
@@ -441,11 +438,19 @@
                                     Cancel
                                 </button>
 
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-check me-2"></i>
-                                    Save
-                                </button>
-
+                                <div>
+                                    @if (!IsNewScreening)
+                                    {
+                                        <button type="button" class="btn btn-danger me-2" @onclick="DeleteScreening">
+                                            <i class="fas fa-trash me-2"></i>
+                                            Delete
+                                        </button>
+                                    }
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check me-2"></i>
+                                        Save
+                                    </button>
+                                </div>
                             </div>
                         </EditForm>
                     </div>

@@ -35,3 +35,21 @@
         display: inline-block;
     }
 }
+
+
+/* --- Honor Flight Toolbar Styles --- */
+.honorflight-toolbar {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.honorflight-toolbar .form-label {
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.honorflight-toolbar .form-select {
+    min-width: 180px;
+}

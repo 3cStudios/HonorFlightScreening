@@ -3,6 +3,7 @@ using HonorFlightScreening.Components;
 using HonorFlightScreening.Components.Account;
 using HonorFlightScreening.Data;
 using HonorFlightScreening.Helper;
+using HonorFlightScreening.Services;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -81,7 +82,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 // Add application services
-builder.Services.AddScoped<HonorFlightScreening.Services.VeteranScreeningService>();
+builder.Services.AddScoped<VeteranScreeningService>();
+builder.Services.AddScoped<HonorFlightService>();
+builder.Services.AddCascadingValue(sp => new HonorFlightSession() );
+
 
 var app = builder.Build();
 

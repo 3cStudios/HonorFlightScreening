@@ -4,6 +4,7 @@ using HonorFlightScreening.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HonorFlightScreening.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250621122432_InitialTablesWithoutFKHonorFlight")]
+    partial class InitialTablesWithoutFKHonorFlight
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,8 +221,6 @@ namespace HonorFlightScreening.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HonorFlightId");
-
                     b.ToTable("VeteranScreenings");
                 });
 
@@ -356,17 +357,6 @@ namespace HonorFlightScreening.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("HonorFlightScreening.Data.VeteranScreening", b =>
-                {
-                    b.HasOne("HonorFlightScreening.Data.HonorFlight", "HonorFlight")
-                        .WithMany("VeteranScreenings")
-                        .HasForeignKey("HonorFlightId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("HonorFlight");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -416,11 +406,6 @@ namespace HonorFlightScreening.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("HonorFlightScreening.Data.HonorFlight", b =>
-                {
-                    b.Navigation("VeteranScreenings");
                 });
 #pragma warning restore 612, 618
         }
