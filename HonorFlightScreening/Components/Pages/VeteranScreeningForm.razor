@@ -92,12 +92,12 @@
                                     <label class="question-label">Is PCP signature missing?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.HasPcpSignature == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.HasPcpSignature == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.HasPcpSignature = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.HasPcpSignature == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.HasPcpSignature == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.HasPcpSignature = false">
                                             NO
                                         </button>
@@ -116,12 +116,12 @@
                                     <label class="question-label">Do you use oxygen?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.UseOxygen == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.UseOxygen == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.UseOxygen = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.UseOxygen == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.UseOxygen == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.UseOxygen = false">
                                             NO
                                         </button>
@@ -142,12 +142,12 @@
                                     <label class="question-label">Do you use insulin?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.UseInsulin == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.UseInsulin == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.UseInsulin = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.UseInsulin == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.UseInsulin == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.UseInsulin = false">
                                             NO
                                         </button>
@@ -158,12 +158,12 @@
                                             <label for="notes" class="form-label">Do you need help giving yourself insulin?</label>
                                             <div class="btn-group-toggle d-flex gap-2">
                                                 <button type="button"
-                                                        class="btn @(_screening.HelpWithInsulin == true ? "btn-success" : "btn-outline-secondary")"
+                                                        class="btn @(_screening.HelpWithInsulin == true ? "btn-danger" : "btn-outline-secondary")"
                                                         @onclick="() => _screening.HelpWithInsulin = true">
                                                     YES
                                                 </button>
                                                 <button type="button"
-                                                        class="btn @(_screening.HelpWithInsulin == false ? "btn-danger" : "btn-outline-secondary")"
+                                                        class="btn @(_screening.HelpWithInsulin == false ? "btn-success" : "btn-outline-secondary")"
                                                         @onclick="() => _screening.HelpWithInsulin = false">
                                                     NO
                                                 </button>
@@ -176,12 +176,12 @@
                                     <label class="question-label">Do you use fluid pills?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.FluidPills == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.FluidPills == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.FluidPills = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.FluidPills == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.FluidPills == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.FluidPills = false">
                                             NO
                                         </button>
@@ -191,12 +191,12 @@
                                     <label class="question-label">Any medical concerns for the trip?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.MedicalConcerns == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.MedicalConcerns == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.MedicalConcerns = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.MedicalConcerns == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.MedicalConcerns == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.MedicalConcerns = false">
                                             NO
                                         </button>
@@ -224,12 +224,12 @@
                                     <label class="question-label">Do you require assistive devices for getting around?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.RequiresAssistiveDevice == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.RequiresAssistiveDevice == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => { _screening.RequiresAssistiveDevice = true; }">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.RequiresAssistiveDevice == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.RequiresAssistiveDevice == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => { _screening.RequiresAssistiveDevice = false; _screening.AssistiveDeviceType = null; }">
                                             NO
                                         </button>
@@ -260,12 +260,12 @@
                                     <label class="question-label">Any concerns about walking up and down steps in a bus?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.ConcernsWalkingStairsBus == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.ConcernsWalkingStairsBus == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.ConcernsWalkingStairsBus = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.ConcernsWalkingStairsBus == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.ConcernsWalkingStairsBus == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.ConcernsWalkingStairsBus = false">
                                             NO
                                         </button>
@@ -276,12 +276,12 @@
                                     <label class="question-label">Any concerns about flying?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.ConcernsFlying == true ? "btn-success" : "btn-outline-secondary")"
+                                                class="btn @(_screening.ConcernsFlying == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.ConcernsFlying = true">
                                             YES
                                         </button>
                                         <button type="button"
-                                                class="btn @(_screening.ConcernsFlying == false ? "btn-danger" : "btn-outline-secondary")"
+                                                class="btn @(_screening.ConcernsFlying == false ? "btn-success" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.ConcernsFlying = false">
                                             NO
                                         </button>
@@ -313,7 +313,7 @@
                                     }
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.HasMedicalAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                class="btn @(_screening.HasMedicalAlerts == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.HasMedicalAlerts = true">
                                             YES
                                         </button>
@@ -341,7 +341,7 @@
                                     }
                                     <div class="btn-group-toggle d-flex gap-2 mb-3">
                                         <button type="button"
-                                                class="btn @(_screening.HasMobilityAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                class="btn @(_screening.HasMobilityAlerts == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.HasMobilityAlerts = true">
                                             YES
                                         </button>
@@ -357,7 +357,7 @@
                                         <div class="btn-group-toggle d-flex gap-2 mb-3">
 
                                             <button type="button"
-                                                    class="btn @(_screening.LiftRequired == Yes ? "btn-warning" : "btn-outline-secondary")"
+                                                    class="btn @(_screening.LiftRequired == Yes ? "btn-danger" : "btn-outline-secondary")"
                                                     @onclick="SetLiftRequiredYes">
                                                 YES
                                             </button>
@@ -376,10 +376,21 @@
                                 </div>
 
                                 <div class="question-group">
+                                    @{
+                                        if (_screening.UseInsulin is true
+                                        && _screening.HelpWithInsulin is true)
+                                        {
+                                            _screening.HasSpecialAlerts = true;
+                                        }
+                                        else
+                                        {
+                                            _screening.HasSpecialAlerts = false;
+                                        }
+                                    }
                                     <label class="question-label">Are there any special alerts?</label>
                                     <div class="btn-group-toggle d-flex gap-2">
                                         <button type="button"
-                                                class="btn @(_screening.HasSpecialAlerts == true ? "btn-warning" : "btn-outline-secondary")"
+                                                class="btn @(_screening.HasSpecialAlerts == true ? "btn-danger" : "btn-outline-secondary")"
                                                 @onclick="() => _screening.HasSpecialAlerts = true">
                                             YES
                                         </button>

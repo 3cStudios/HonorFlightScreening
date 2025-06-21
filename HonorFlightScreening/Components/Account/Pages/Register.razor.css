@@ -1,0 +1,10 @@
+﻿.flag-container {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.flag-container img {
+    width: 100%;
+    height: auto;
+ }

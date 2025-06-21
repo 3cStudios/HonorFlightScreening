@@ -22,7 +22,7 @@ public class VeteranScreening
 
     [Required]
     [StringLength(50)]
-    public string SoundOffNumber { get; set; } = string.Empty;
+    public int SoundOffNumber { get; set; }
 
     public string UserId { get; set; } = string.Empty;
     

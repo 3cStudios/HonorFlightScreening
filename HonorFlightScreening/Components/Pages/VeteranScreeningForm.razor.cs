@@ -37,7 +37,7 @@ namespace HonorFlightScreening.Components.Pages
                 }
                 else
                 {
-                    Navigation.NavigateTo("/VeteranScreenings");
+                    Navigation.NavigateTo("/FlightSummary");
                 }
             }
         }
@@ -56,14 +56,14 @@ namespace HonorFlightScreening.Components.Pages
                 await ScreeningService.UpdateScreeningAsync(_screening);
             }
 
-            await JsRuntime.InvokeVoidAsync("alert", "Screening saved successfully!");
+            Navigation.NavigateTo("/FlightSummary");
         }
 
 
 
         private void GoBack()
         {
-            Navigation.NavigateTo("/VeteranScreenings");
+            Navigation.NavigateTo("/FlightSummary");
         }
 
         private void OnNotesInput(ChangeEventArgs e)
