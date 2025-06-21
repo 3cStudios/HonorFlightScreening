@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HonorFlightScreening.Components.Pages
 {
-    public partial class VeteranScreenings: ComponentBase
+    public partial class FlightSummary : ComponentBase
     {
         [Inject] private VeteranScreeningService ScreeningService { get; set; } = default!;
         [Inject] private NavigationManager Navigation { get; set; } = default!;
@@ -15,7 +15,7 @@ namespace HonorFlightScreening.Components.Pages
         private List<VeteranScreening>? _filteredScreenings;
 
         private string? _searchVeteranName;
-        private string? _searchSoundOffNumber;
+        private int? _searchSoundOffNumber;
 
 
         private readonly Dictionary<string, bool> _sortAscendingByColumn = new()
@@ -75,7 +75,7 @@ namespace HonorFlightScreening.Components.Pages
         private void ClearSoundOffNumberFilter()
         {
             _soundOffNumberFilterApplied = false;
-            _searchSoundOffNumber = string.Empty;
+            _searchSoundOffNumber = null;
             FilterScreenings();
         }
 
@@ -87,7 +87,7 @@ namespace HonorFlightScreening.Components.Pages
                 return;
             }
             if (string.IsNullOrEmpty(_searchVeteranName) &&
-                string.IsNullOrEmpty(_searchSoundOffNumber))
+                _searchSoundOffNumber == null)
             {
                 _filteredScreenings = _screenings.ToList();
                 return;
@@ -95,8 +95,8 @@ namespace HonorFlightScreening.Components.Pages
             IEnumerable<VeteranScreening> query = _screenings;
             if (!string.IsNullOrWhiteSpace(_searchVeteranName))
                 query = query.Where(s => s.VeteranName.Contains(_searchVeteranName, StringComparison.OrdinalIgnoreCase));
-            if (!string.IsNullOrWhiteSpace(_searchSoundOffNumber))
-                query = query.Where(s => s.SoundOffNumber.Contains(_searchSoundOffNumber, StringComparison.OrdinalIgnoreCase));
+            if (_searchSoundOffNumber != null)
+                query = query.Where(s => s.SoundOffNumber == _searchSoundOffNumber);
             _filteredScreenings = query.ToList();
         }
 
@@ -149,6 +149,9 @@ namespace HonorFlightScreening.Components.Pages
                 "LiftRequired" => ascending ? _filteredScreenings.OrderBy(s => s.LiftRequired).ToList() : _filteredScreenings.OrderByDescending(s => s.LiftRequired).ToList(),
                 "UseOxygen" => ascending ? _filteredScreenings.OrderBy(s => s.UseOxygen).ToList() : _filteredScreenings.OrderByDescending(s => s.UseOxygen).ToList(),
                 "HowMuchOxygen" => ascending ? _filteredScreenings.OrderBy(s => s.HowMuchOxygen).ToList() : _filteredScreenings.OrderByDescending(s => s.HowMuchOxygen).ToList(),
+                "HasPcpSignature" => ascending
+                    ? _filteredScreenings.OrderBy(s => s.HasPcpSignature ?? false).ToList()
+                    : _filteredScreenings.OrderByDescending(s => s.HasPcpSignature ?? false).ToList(),
                 _ => _filteredScreenings
             };
         }

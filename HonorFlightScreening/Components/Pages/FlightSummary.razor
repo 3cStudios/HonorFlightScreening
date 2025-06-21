@@ -1,11 +1,11 @@
-﻿@page "/VeteranScreenings"
+﻿@page "/FlightSummary"
 
 
 @using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
 @attribute [Authorize]
 
-<PageTitle>Veteran Screenings</PageTitle>
+<PageTitle>Flight Summary</PageTitle>
 
 <div class="container-fluid">
     <div class="row">
@@ -13,7 +13,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0 text-primary">
                     <i class="fas fa-clipboard-list me-2"></i>
-                    Screenings
+                    Flight Summary
                 </h1>
                 <button type="button" class="btn btn-primary" @onclick="CreateNewScreening">
                 <i class="fas fa-plus me-2"></i>
@@ -59,6 +59,11 @@ else
                     <th>
                         <button type="button" class="btn p-0 fw-bold" @onclick='() => OnSort("SoundOffNumber")'>
                             Sound-Off @((MarkupString)GetSortIcon("SoundOffNumber"))
+                        </button>
+                    </th>
+                    <th>
+                        <button type="button" class="btn p-0 fw-bold" @onclick='() => OnSort("HasPcpSignature")'>
+                            PCP Signature @((MarkupString)GetSortIcon("HasPcpSignature"))
                         </button>
                     </th>
                     <th>
@@ -141,6 +146,7 @@ else
                         <tr style="cursor:pointer" @onclick="() => NavigateToScreening(screening.Id)">
                             <td>@screening.VeteranName</td>
                             <td>@screening.SoundOffNumber</td>
+                            <td>@(screening.HasPcpSignature == true ? "Yes" : "No")</td>
                             <td>@(screening.HasMedicalAlerts == true ? "Yes" : "No")</td>
                             <td>@(screening.HasMobilityAlerts == true ? "Yes" : "No")</td>
                             <td>@(screening.HasSpecialAlerts == true ? "Yes" : "No")</td>
@@ -167,11 +173,25 @@ else
                         <div class="swipe-card-content">
                             <div><strong>Name:</strong> @screening.VeteranName</div>
                             <div><strong>Sound-Off:</strong> @screening.SoundOffNumber</div>
+                            <div><strong>PCP Signature:</strong> 
+                                @{
+                                    if (screening.HasPcpSignature == true)
+                                    {
+                                        <span class="badge bg-danger">Yes</span>
+                                            
+                                    }
+                                    else
+                                    {
+                                        <span>No</span>
+                                    }
+                                                                    
+                                }
+                            </div>
                             <div><strong>Medical Alerts:</strong> 
                                     @{
                                         if (screening.HasMedicalAlerts == true)
                                         {
-                                            <span class="badge bg-warning">Yes</span>
+                                            <span class="badge bg-danger">Yes</span>
                                             
                                         }
                                         else
@@ -185,7 +205,7 @@ else
                                  @{
                                         if (screening.HasMobilityAlerts == true)
                                         {
-                                            <span class="badge bg-warning">Yes</span>
+                                            <span class="badge bg-danger">Yes</span>
                                             
                                         }
                                         else
@@ -201,7 +221,7 @@ else
                                 @{
                                     if (screening.HasSpecialAlerts == true)
                                     {
-                                        <span class="badge bg-warning">Yes</span>
+                                        <span class="badge bg-danger">Yes</span>
                                             
                                     }
                                     else
@@ -218,7 +238,7 @@ else
                                 @{
                                     if (screening.UseOxygen == true)
                                     {
-                                        <span class="badge bg-warning">Yes</span>
+                                        <span class="badge bg-danger">Yes</span>
                                             
                                     }
                                     else
@@ -242,13 +262,12 @@ else
     <div class="mt-4">
         <h5>Summary</h5>
         <ul>
-            <li>Total Use Oxygen: @_summaryUseOxygen</li>
-            <li>Total Lift Required: @_summaryLiftRequiredYes</li>
             <li>Total Lift Required: @_summaryLiftRequiredYes</li>
             <li>Total Medical Alerts: @_summaryMedicalAlerts</li>
             <li>Total Mobility Alerts: @_summaryMobilityAlerts</li>
             <li>Total Special Alerts: @_summarySpecialAlerts</li>
             <li>Total Signature Needed: @_summaryPCPSignature</li>
+            <li>Total Use Oxygen: @_summaryUseOxygen</li>
         </ul>
     </div>
     }

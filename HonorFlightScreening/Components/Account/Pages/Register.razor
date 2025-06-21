@@ -20,6 +20,9 @@
 
 <div class="row">
     <div class="col-md-4 mx-auto">
+        <div class="flag-container">
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="American Flag" class="flag-banner" />
+        </div>
         <StatusMessage Message="@Message" />
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
